@@ -3,99 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joydeep Swarnakar | Analytics Engineer & Data Consultant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>Joydeep Swarnakar | Data Scientist & Analytics Engineer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0B0F19;
+            --bg: #0A0E17;
             --card-bg: #111827;
+            --card-hover: #162032;
             --text-main: #F9FAFB;
             --text-muted: #9CA3AF;
             --accent: #38BDF8;
-            --accent-glow: rgba(56, 189, 248, 0.15);
+            --accent-glow: rgba(56, 189, 248, 0.12);
             --border: #1F2937;
+            --tag-bg: #1E293B;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); color: var(--text-main); line-height: 1.6; padding: 0 20px; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 60px 0; }
+        .container { max-width: 1050px; margin: 0 auto; padding: 60px 0 100px 0; }
         
-        /* Hero */
+        /* Header / Hero */
         header { text-align: center; margin-bottom: 70px; }
         .badge { display: inline-block; padding: 6px 14px; background: var(--accent-glow); color: var(--accent); border-radius: 20px; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--accent); margin-bottom: 20px; }
-        h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
-        p.subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 650px; margin: 0 auto 30px auto; }
+        h1 { font-size: 3rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+        p.subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 750px; margin: 0 auto 25px auto; }
         
+        .contact-bar { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; font-size: 0.95rem; color: var(--text-muted); }
+        .contact-bar a { color: var(--accent); text-decoration: none; }
+        .contact-bar a:hover { text-decoration: underline; }
+
         /* Buttons */
         .btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 12px 26px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 0.95rem; transition: all 0.2s ease; }
+        .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 0.95rem; transition: all 0.2s ease; }
         .btn-primary { background: var(--accent); color: #000; }
         .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-secondary { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); }
         .btn-secondary:hover { border-color: var(--accent); transform: translateY(-2px); }
 
-        /* Skills */
-        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 60px; }
-        .skill-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 0.95rem; }
+        /* Section Headings */
+        h2.section-title { font-size: 1.8rem; margin: 60px 0 25px 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 
-        /* Projects Section */
-        h2.section-title { font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .project-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin-bottom: 30px; transition: border 0.3s; }
-        .project-card:hover { border-color: var(--accent); }
-        .project-card h3 { font-size: 1.4rem; margin-bottom: 10px; color: var(--text-main); }
+        /* Experience & Projects Cards */
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin-bottom: 25px; transition: border 0.3s; }
+        .card:hover { border-color: var(--accent); }
+        .card-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px; }
+        .card-header h3 { font-size: 1.35rem; color: var(--text-main); }
+        .card-header .date-location { font-size: 0.9rem; color: var(--text-muted); }
+        .role-title { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-bottom: 15px; }
+        
+        ul.experience-points { list-style-position: inside; color: #D1D5DB; margin-top: 10px; }
+        ul.experience-points li { margin-bottom: 8px; }
+
+        /* Skills Grid */
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .skill-card { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 10px; }
+        .skill-card h4 { color: var(--accent); font-size: 0.95rem; margin-bottom: 8px; }
+        .skill-card p { font-size: 0.88rem; color: var(--text-muted); }
+
+        /* Tags / Tech Stack */
         .tech-stack { display: flex; gap: 8px; flex-wrap: wrap; margin: 15px 0; }
-        .tech-pill { background: #1E293B; color: var(--accent); font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; font-weight: 600; }
-        .project-links { margin-top: 20px; display: flex; gap: 15px; }
+        .tech-pill { background: var(--tag-bg); color: var(--accent); font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; font-weight: 600; }
+        
+        /* Grid Lists (Education / Certifications) */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .info-card { background: var(--card-bg); border: 1px solid var(--border); padding: 22px; border-radius: 10px; }
+        .info-card h4 { font-size: 1.1rem; margin-bottom: 6px; color: var(--text-main); }
+        .info-card p { font-size: 0.9rem; color: var(--text-muted); }
 
         /* Footer */
-        footer { text-align: center; margin-top: 80px; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 30px; }
+        footer { text-align: center; margin-top: 90px; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 30px; }
     </style>
 </head>
 <body>
     <div class="container">
+        
         <header>
-            <div class="badge">Available for Analytics Consulting & Freelance</div>
+            <div class="badge">Open for Freelance Consulting & Full-Time Opportunities</div>
             <h1>Joydeep Swarnakar</h1>
-            <p class="subtitle">Analytics Engineer specializing in modern data stack architecture, dbt Core transformations, Snowflake data warehousing, and executive BI dashboards.</p>
+            <p class="subtitle">Data Scientist & Analytics Engineer with 2+ years of experience building production NLP systems, predictive models, dbt transformation pipelines, and executive BI dashboards.</p>
+            
+            <div class="contact-bar">
+                <span>📧 <a href="mailto:joydeep0777@gmail.com">joydeep0777@gmail.com</a></span>
+                <span>📱 +91 93327 49120</span>
+                <span>🔗 <a href="https://linkedin.com/in/joydeep-swarnakar" target="_blank">LinkedIn</a></span>
+                <span>💻 <a href="https://github.com/joydeepswarnakar81-prog" target="_blank">GitHub</a></span>
+            </div>
+
             <div class="btn-group">
-                <a href="https://github.com/joydeepswarnakar81-prog" target="_blank" class="btn btn-secondary">GitHub Profile</a>
-                <a href="https://public.tableau.com/views/dbt-snowflake-executive-analytics/Dashboard1" target="_blank" class="btn btn-primary">Live BI Dashboard</a>
+                <a href="https://public.tableau.com/views/dbt-snowflake-executive-analytics/Dashboard1" target="_blank" class="btn btn-primary">Live BI Dashboard ↗</a>
+                <a href="https://github.com/joydeepswarnakar81-prog/analytics-engineering-dbt-snowflake" target="_blank" class="btn btn-secondary">Featured dbt Project ↗</a>
             </div>
         </header>
 
         <section>
-            <h2 class="section-title">Core Expertise</h2>
+            <h2 class="section-title">Core Technical Competencies</h2>
             <div class="skills-grid">
-                <div class="skill-card">dbt Core / dbt Cloud</div>
-                <div class="skill-card">Snowflake / Data Cloud</div>
-                <div class="skill-card">Kimball Data Modeling</div>
-                <div class="skill-card">SQL Transformation</div>
-                <div class="skill-card">Tableau / Power BI</div>
-                <div class="skill-card">Automated Data Testing</div>
+                <div class="skill-card">
+                    <h4>Languages & Code</h4>
+                    <p>Python, SQL, Java, Data Structures & Algorithms</p>
+                </div>
+                <div class="skill-card">
+                    <h4>Data Science & ML/NLP</h4>
+                    <p>scikit-learn, Hugging Face Transformers, NLTK, OpenCV, PyTesseract, Pandas, NumPy</p>
+                </div>
+                <div class="skill-card">
+                    <h4>Data & Cloud Architecture</h4>
+                    <p>dbt Core / Cloud, Snowflake, AWS (S3, EC2), ETL Pipeline Design, Relational DB Administration</p>
+                </div>
+                <div class="skill-card">
+                    <h4>BI & Visualization</h4>
+                    <p>Tableau Public, Power BI, Executive KPI Reporting, A/B Testing</p>
+                </div>
             </div>
         </section>
 
         <section>
             <h2 class="section-title">Featured Production Project</h2>
-            <div class="project-card">
-                <h3>Modern Analytics Engineering: dbt Core + Snowflake + BI</h3>
-                <p>An enterprise-grade ELT pipeline converting raw transactional e-commerce event streams into Kimball Star-Schema Data Marts (<code>dim_customers</code> & <code>fct_orders</code>) with automated data quality CI/CD testing.</p>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Modern Analytics Engineering: dbt Core + Snowflake + BI</h3>
+                    <span class="date-location">Enterprise Data Stack</span>
+                </div>
+                <div class="role-title">Lead Analytics Engineer</div>
+                <p>Designed and deployed an end-to-end ELT pipeline transforming raw transactional e-commerce event records into high-performance Kimball Star-Schema Data Marts (<code>dim_customers</code> & <code>fct_orders</code>) backed by automated CI/CD schema assertions and an executive BI dashboard.</p>
+                
                 <div class="tech-stack">
                     <span class="tech-pill">dbt Core</span>
                     <span class="tech-pill">Snowflake</span>
-                    <span class="tech-pill">Kimball Star-Schema</span>
+                    <span class="tech-pill">Kimball Dimensional Modeling</span>
                     <span class="tech-pill">Tableau Public</span>
-                    <span class="tech-pill">Data Testing & Governance</span>
+                    <span class="tech-pill">Automated Data Testing</span>
                 </div>
-                <div class="project-links">
-                    <a href="https://github.com/joydeepswarnakar81-prog/analytics-engineering-dbt-snowflake" target="_blank" class="btn btn-secondary">View Source & Models</a>
-                    <a href="https://public.tableau.com/views/dbt-snowflake-executive-analytics/Dashboard1" target="_blank" class="btn btn-primary">Open Live Dashboard ↗</a>
+
+                <div style="margin-top: 20px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="https://github.com/joydeepswarnakar81-prog/analytics-engineering-dbt-snowflake" target="_blank" class="btn btn-secondary">Source Code & Models</a>
+                    <a href="https://public.tableau.com/views/dbt-snowflake-executive-analytics/Dashboard1" target="_blank" class="btn btn-primary">Open Interactive Dashboard ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Professional Experience</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Go Sky Aviation Limited</h3>
+                    <span class="date-location">India | Oct 2022 – Aug 2024</span>
+                </div>
+                <div class="role-title">Data Scientist</div>
+                <ul class="experience-points">
+                    <li>Built and deployed NLP sentiment analysis models on customer feedback data spanning hundreds of thousands of records using NLTK, Hugging Face Transformers, and scikit-learn.</li>
+                    <li>Developed and deployed an NLP-powered chatbot to automate first-line customer support responses, reducing manual query handling and improving response consistency.</li>
+                    <li>Designed and maintained interactive Power BI and Tableau dashboards translating raw customer and operational data into business-ready insights used daily by 50–60 stakeholders across departments.</li>
+                    <li>Built and managed SQL-based ETL pipelines to extract, clean, and transform customer and operational data from multiple sources, ensuring reliable, analysis-ready datasets for downstream modeling and reporting.</li>
+                    <li>Developed forecasting models to support business planning using statistical and machine learning techniques on historical operational data.</li>
+                    <li>Applied computer vision techniques (OpenCV, PyTesseract) to automate extraction of information from image-based and scanned documents, reducing manual data entry effort.</li>
+                    <li>Ran A/B tests to evaluate the impact of model and feature changes, using results to guide iteration on deployed NLP and forecasting solutions.</li>
+                    <li>Administered and optimized relational databases (SQL) supporting core data science workflows, ensuring data integrity and query performance.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Unschool Edtech Pvt. Ltd.</h3>
+                    <span class="date-location">India</span>
+                </div>
+                <div class="role-title">Marketing Intern (Youth Influencer)</div>
+                <p>Supported digital marketing campaigns targeting student audiences, applying foundational digital marketing and audience segmentation skills in a live business setting.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Pawzzitive Welfare Foundation</h3>
+                    <span class="date-location">India</span>
+                </div>
+                <div class="role-title">Campaign Support Intern</div>
+                <p>Assisted in planning and executing outreach campaigns to support organizational fundraising and community awareness goals.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Education</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Bangalore University – Bangalore Institute of Management Studies</h4>
+                    <p><strong>Bachelor of Computer Applications (B.C.A.)</strong></p>
+                    <p>First Class, CGPA: 6.78 | Bangalore, India</p>
+                </div>
+                <div class="info-card">
+                    <h4>West Bengal Council of Higher Secondary Education (WBCHSE)</h4>
+                    <p><strong>Higher Secondary Examination</strong> — 70.2%</p>
+                    <p>West Bengal, India (2018)</p>
+                </div>
+                <div class="info-card">
+                    <h4>West Bengal Board of Secondary Education (WBBSE)</h4>
+                    <p><strong>Madhyamik Examination</strong> — 53.28%</p>
+                    <p>West Bengal, India (2016)</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Certifications & Honors</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>University of Michigan</h4>
+                    <p>• Python Basics & Functions, Files, Dictionaries</p>
+                    <p>• Python Classes, Inheritance, and Data Collection</p>
+                    <p>• Python Project: Pillow, Tesseract, OpenCV</p>
+                </div>
+                <div class="info-card">
+                    <h4>Google & Skill India Digital</h4>
+                    <p>• Google: Fundamentals of Digital Marketing</p>
+                    <p>• Skill India Digital / NSDC: Web Design and Development</p>
+                </div>
+                <div class="info-card">
+                    <h4>ISRO, TCS & RGCSM</h4>
+                    <p>• <strong>ISRO:</strong> Overview of Space Science and Technology (START Program)</p>
+                    <p>• <strong>TCS iON:</strong> Career Edge – Young Professional</p>
+                    <p>• <strong>RGCSM:</strong> Advanced Diploma in Office Automation & Publishing</p>
                 </div>
             </div>
         </section>
 
         <footer>
-            <p>© 2026 Joydeep Swarnakar. All Rights Reserved.</p>
+            <p>© 2026 Joydeep Swarnakar · <a href="mailto:joydeep0777@gmail.com" style="color: var(--accent); text-decoration: none;">joydeep0777@gmail.com</a> · Built & Hosted on GitHub Pages</p>
         </footer>
+
     </div>
 </body>
 </html>
