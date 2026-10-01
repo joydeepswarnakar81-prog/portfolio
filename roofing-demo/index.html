@@ -4,139 +4,91 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Apex 3D Exterior & Roofing Visualizer | Contractor Pro Suite</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <style>
     :root {
       --amber: #f59e0b;
-      --amber-dark: #b45309;
       --bg-dark: #0a0e17;
-      --panel-bg: rgba(13, 19, 33, 0.92);
+      --panel-bg: rgba(15, 23, 42, 0.92);
       --border: rgba(255, 255, 255, 0.12);
       --text: #f9fafb;
       --text-muted: #9ca3af;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--bg-dark); color: var(--text); overflow: hidden; width: 100vw; height: 100vh; position: relative; }
 
-    /* Top Brand Bar */
     header {
       position: absolute; top: 0; left: 0; width: 100%; z-index: 30;
       padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(180deg, rgba(10,14,23,0.92) 0%, rgba(10,14,23,0) 100%);
+      background: linear-gradient(180deg, rgba(10,14,23,0.95) 0%, transparent 100%);
       pointer-events: none;
     }
     .brand-wrap { display: flex; align-items: center; gap: 10px; pointer-events: auto; }
-    .brand-title { font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+    .brand-title { font-size: 1.15rem; font-weight: 800; color: #fff; }
     .brand-title span { color: var(--amber); }
-    .contractor-badge {
+    .badge {
       background: rgba(245, 158, 11, 0.15); border: 1px solid var(--amber); color: #fde68a;
-      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-      padding: 4px 10px; border-radius: 20px; pointer-events: auto;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
     }
 
-    /* 3D WebGL Canvas */
     #canvas-container { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 1; }
 
-    /* Floating Visualizer Panel */
     .visualizer-ui {
-      position: absolute; top: 80px; right: 24px; width: 360px; max-height: calc(100vh - 105px);
+      position: absolute; top: 75px; right: 24px; width: 350px; max-height: calc(100vh - 95px);
       background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
-      border-radius: 18px; padding: 22px; z-index: 25; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+      border-radius: 18px; padding: 20px; z-index: 25; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
     }
     .visualizer-ui::-webkit-scrollbar { width: 4px; }
     .visualizer-ui::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
-    .panel-header h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 2px; }
-    .panel-header p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px; }
-
     .control-block { margin-bottom: 16px; }
     .control-label {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--text-muted); margin-bottom: 8px;
+      display: flex; justify-content: space-between; font-size: 0.74rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;
     }
-    .selected-tag { color: var(--amber); font-weight: 600; text-transform: none; }
+    .tag { color: var(--amber); font-weight: 600; text-transform: none; }
 
-    /* Material Selector */
     .tab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .tab-btn {
       background: #1e293b; border: 1px solid var(--border); color: #fff;
-      padding: 9px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
-      cursor: pointer; text-align: center; transition: all 0.2s ease;
+      padding: 9px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
     }
-    .tab-btn:hover { background: #334155; }
     .tab-btn.active { background: rgba(245, 158, 11, 0.16); border-color: var(--amber); color: #fbbf24; }
 
-    /* Swatches */
     .swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .swatch {
-      height: 42px; border-radius: 8px; border: 2px solid transparent; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      font-size: 0.65rem; font-weight: 700; transition: all 0.2s ease; user-select: none;
+      height: 38px; border-radius: 8px; border: 2px solid transparent; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700;
+      transition: transform 0.2s;
     }
     .swatch:hover { transform: translateY(-2px); }
-    .swatch.active { border-color: #fff; transform: scale(1.05); box-shadow: 0 0 14px rgba(255,255,255,0.4); }
+    .swatch.active { border-color: #fff; transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
 
-    /* Environment / Lighting Toggles */
-    .pill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .pill-btn {
-      background: #1e293b; border: 1px solid var(--border); color: var(--text-muted);
-      padding: 7px; font-size: 0.72rem; font-weight: 600; border-radius: 6px; cursor: pointer;
-      text-align: center; transition: all 0.2s;
-    }
-    .pill-btn:hover { background: #334155; color: #fff; }
-    .pill-btn.active { border-color: var(--amber); background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-
-    /* Dynamic Pricing Box */
     .estimate-card {
-      background: rgba(30, 41, 59, 0.75); border: 1px solid var(--border);
-      border-radius: 12px; padding: 15px; margin-top: 16px;
+      background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; margin-top: 14px;
     }
-    .estimate-title { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
-    .estimate-cost { font-size: 1.45rem; font-weight: 800; color: #38bdf8; margin: 3px 0; }
-    .estimate-details { font-size: 0.72rem; color: #94a3b8; line-height: 1.35; }
+    .est-cost { font-size: 1.4rem; font-weight: 800; color: #38bdf8; margin: 2px 0; }
 
     .btn-submit {
       width: 100%; margin-top: 14px; background: var(--amber); color: #000;
-      font-weight: 800; font-size: 0.9rem; padding: 13px; border: none; border-radius: 8px;
-      cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.4);
+      font-weight: 800; font-size: 0.88rem; padding: 12px; border: none; border-radius: 8px;
+      cursor: pointer; transition: all 0.2s;
     }
-    .btn-submit:hover { background: #d97706; color: #fff; transform: translateY(-1px); }
+    .btn-submit:hover { background: #d97706; color: #fff; }
 
-    /* Instruction Badge */
-    .helper-tag {
-      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    .hint {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
       background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border);
-      padding: 7px 18px; border-radius: 30px; font-size: 0.75rem; color: #cbd5e1;
-      pointer-events: none; z-index: 10; backdrop-filter: blur(8px);
+      padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; color: #cbd5e1;
+      pointer-events: none; z-index: 10;
     }
 
-    /* Lead Modal */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-      z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px);
-    }
-    .modal-box {
-      background: #0f172a; border: 1px solid var(--border); border-radius: 16px;
-      max-width: 400px; width: 100%; padding: 28px; box-shadow: 0 30px 60px rgba(0,0,0,0.85);
-    }
-    .modal-box h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; }
-    .modal-box p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
-    .modal-box input {
-      width: 100%; background: #1e293b; border: 1px solid var(--border); color: #fff;
-      padding: 11px 14px; border-radius: 8px; font-size: 0.88rem; margin-bottom: 12px; outline: none;
-    }
-    .modal-box input:focus { border-color: var(--amber); }
-
-    /* Responsive */
     @media (max-width: 768px) {
-      .visualizer-ui {
-        top: auto; bottom: 0; left: 0; right: 0; width: 100%;
-        max-height: 50vh; border-radius: 20px 20px 0 0; padding: 18px;
-      }
-      .helper-tag { display: none; }
+      .visualizer-ui { top: auto; bottom: 0; left: 0; right: 0; width: 100%; max-height: 48vh; border-radius: 20px 20px 0 0; }
+      .hint { display: none; }
     }
   </style>
 </head>
@@ -145,340 +97,271 @@
   <header>
     <div class="brand-wrap">
       <div class="brand-title">🏠 PrecisionRoof <span>3D Studio</span></div>
-      <span class="contractor-badge">Live Interactive Visualizer</span>
+      <span class="badge">Live 3D Configurator</span>
     </div>
   </header>
 
   <div id="canvas-container"></div>
+  <div class="hint">🖱️️ Left-Click + Drag to rotate 360° · Right-Click to pan · Scroll to zoom</div>
 
-  <div class="helper-tag">🖱️ Drag to orbit 360° · Pinch or Scroll to inspect details</div>
-
-  <!-- Configurator UI -->
   <div class="visualizer-ui">
-    <div class="panel-header">
-      <h2>Exterior Specifier</h2>
-      <p>Configure architectural roofing & siding materials in real-time.</p>
-    </div>
+    <h3 style="font-size: 1.05rem; margin-bottom: 2px;">Exterior Specifier</h3>
+    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px;">Preview actual shingle & siding combinations live.</p>
 
-    <!-- Roof System Selection -->
+    <!-- System -->
     <div class="control-block">
-      <div class="control-label">Roof System <span class="selected-tag" id="systemTag">Architectural Shingles</span></div>
+      <div class="control-label">Roof System <span class="tag" id="systemTag">Architectural Shingles</span></div>
       <div class="tab-grid">
         <button class="tab-btn active" onclick="setMaterialType('shingle', this)">Asphalt Shingle</button>
         <button class="tab-btn" onclick="setMaterialType('metal', this)">Standing Seam Metal</button>
       </div>
     </div>
 
-    <!-- Shingle Colors -->
+    <!-- Shingles -->
     <div class="control-block">
-      <div class="control-label">Roofing Color <span class="selected-tag" id="colorTag">Charcoal Black</span></div>
+      <div class="control-label">Roof Color <span class="tag" id="colorTag">Charcoal Black</span></div>
       <div class="swatch-grid">
-        <div class="swatch active" style="background:#1c2024; color:#fff;" onclick="setRoofColor('#1c2024', 'Charcoal Black', 0.8, this)">Charcoal</div>
-        <div class="swatch" style="background:#4b525d; color:#fff;" onclick="setRoofColor('#4b525d', 'Pewter Gray', 0.75, this)">Pewter</div>
-        <div class="swatch" style="background:#5a3f28; color:#fff;" onclick="setRoofColor('#5a3f28', 'Weathered Wood', 0.85, this)">Wood</div>
-        <div class="swatch" style="background:#203a43; color:#fff;" onclick="setRoofColor('#203a43', 'Pacific Slate', 0.7, this)">Slate</div>
+        <div class="swatch active" style="background:#22252a; color:#fff;" onclick="setRoofColor('#22252a', 'Charcoal Black', this)">Charcoal</div>
+        <div class="swatch" style="background:#4b5563; color:#fff;" onclick="setRoofColor('#4b5563', 'Pewter Gray', this)">Pewter</div>
+        <div class="swatch" style="background:#5c4033; color:#fff;" onclick="setRoofColor('#5c4033', 'Barkwood', this)">Barkwood</div>
+        <div class="swatch" style="background:#1e3a5f; color:#fff;" onclick="setRoofColor('#1e3a5f', 'Pacific Blue', this)">Blue</div>
       </div>
     </div>
 
-    <!-- Siding Finish -->
+    <!-- Siding -->
     <div class="control-block">
-      <div class="control-label">Home Siding <span class="selected-tag" id="sidingTag">Alabaster White</span></div>
+      <div class="control-label">Home Siding <span class="tag" id="sidingTag">Alabaster White</span></div>
       <div class="swatch-grid">
-        <div class="swatch active" style="background:#f1f5f9; color:#0f172a;" onclick="setSidingColor('#f1f5f9', 'Alabaster White', this)">Alabaster</div>
-        <div class="swatch" style="background:#64748b; color:#fff;" onclick="setSidingColor('#64748b', 'Slate Harbor', this)">Slate</div>
+        <div class="swatch active" style="background:#f8fafc; color:#0f172a;" onclick="setSidingColor('#f8fafc', 'Alabaster White', this)">Alabaster</div>
+        <div class="swatch" style="background:#64748b; color:#fff;" onclick="setSidingColor('#64748b', 'Slate Gray', this)">Slate</div>
         <div class="swatch" style="background:#b8aea1; color:#0f172a;" onclick="setSidingColor('#b8aea1', 'Warm Greige', this)">Greige</div>
-        <div class="swatch" style="background:#1e293b; color:#fff;" onclick="setSidingColor('#1e293b', 'Modern Onyx', this)">Onyx</div>
+        <div class="swatch" style="background:#1e293b; color:#fff;" onclick="setSidingColor('#1e293b', 'Deep Onyx', this)">Onyx</div>
       </div>
     </div>
 
-    <!-- Lighting Preset -->
-    <div class="control-block">
-      <div class="control-label">Sunlight Scenario</div>
-      <div class="pill-grid">
-        <button class="pill-btn active" onclick="setEnvironment('noon', this)">Sunny Noon</button>
-        <button class="pill-btn" onclick="setEnvironment('sunset', this)">Golden Sunset</button>
-        <button class="pill-btn" onclick="setEnvironment('storm', this)">Overcast</button>
-      </div>
-    </div>
-
-    <!-- Dynamic Estimate Box -->
+    <!-- Estimate -->
     <div class="estimate-card">
-      <div class="estimate-title">Estimated Scope (2,600 sq.ft)</div>
-      <div class="estimate-cost" id="priceDisplay">$12,400 – $14,200</div>
-      <div class="estimate-details" id="priceDetail">Includes 50-Yr Architectural Warranty + Complete Tear-Off & Underlayment</div>
+      <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Estimated Scope (2,600 sq.ft)</div>
+      <div class="est-cost" id="priceDisplay">$12,400 – $14,200</div>
+      <div style="font-size: 0.72rem; color: #94a3b8;" id="priceDetail">Includes 50-Yr Architectural Warranty + Complete Tear-Off</div>
     </div>
 
-    <button class="btn-submit" onclick="toggleModal(true)">Lock In Specs & Request Estimate</button>
-  </div>
-
-  <!-- Estimate Request Modal -->
-  <div class="modal-overlay" id="leadModal">
-    <div class="modal-box">
-      <h3>Lock In Your Specifications</h3>
-      <p>We send your 3D color choices and roof specs directly to our field inspection crew.</p>
-      
-      <input type="text" placeholder="Homeowner Full Name" />
-      <input type="tel" placeholder="Cell Phone Number (for instant text)" />
-      <input type="text" placeholder="Installation Property Address" />
-
-      <button class="btn-submit" onclick="submitLead()">Confirm & Dispatch Free Inspection</button>
-      <button class="pill-btn" style="width: 100%; margin-top: 10px;" onclick="toggleModal(false)">Back to Designer</button>
-    </div>
+    <button class="btn-submit" onclick="alert('Demo Specification Saved! In client builds, this triggers an instant SMS quote to the contractor.')">Request Contractor Estimate</button>
   </div>
 
   <script>
-    // --- Procedural Textures for Photorealism ---
-    function createShingleTexture() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#888888';
-      ctx.fillRect(0, 0, 512, 512);
+    // --- Procedural Textures ---
+    function makeShingleTexture() {
+      const cv = document.createElement('canvas');
+      cv.width = 512; cv.height = 512;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#777777'; ctx.fillRect(0,0,512,512);
 
-      // Procedural shingle horizontal and vertical tabs
-      const rows = 16;
-      const rowHeight = 512 / rows;
+      const rows = 16, rowH = 512 / rows;
       for (let i = 0; i < rows; i++) {
-        const y = i * rowHeight;
-        // Shadow line under shingles
+        const y = i * rowH;
         ctx.fillStyle = '#222222';
-        ctx.fillRect(0, y + rowHeight - 3, 512, 3);
-
-        // Individual shingle slots
-        const cols = 8;
-        const colWidth = 512 / cols;
-        const offset = (i % 2) * (colWidth / 2);
-        for (let j = 0; j < cols + 1; j++) {
-          const x = j * colWidth - offset;
+        ctx.fillRect(0, y + rowH - 3, 512, 3);
+        const cols = 8, colW = 512 / cols, offset = (i % 2) * (colW / 2);
+        for (let j = 0; j <= cols; j++) {
           ctx.fillStyle = '#333333';
-          ctx.fillRect(x, y, 2, rowHeight);
+          ctx.fillRect(j * colW - offset, y, 2, rowH);
         }
       }
-
-      // Add noise grain for shingle granules
-      const imgData = ctx.getImageData(0, 0, 512, 512);
-      for (let k = 0; k < imgData.data.length; k += 4) {
-        const noise = (Math.random() - 0.5) * 45;
-        imgData.data[k] = Math.min(255, Math.max(0, imgData.data[k] + noise));
-        imgData.data[k+1] = Math.min(255, Math.max(0, imgData.data[k+1] + noise));
-        imgData.data[k+2] = Math.min(255, Math.max(0, imgData.data[k+2] + noise));
+      const data = ctx.getImageData(0,0,512,512);
+      for (let k = 0; k < data.data.length; k += 4) {
+        const n = (Math.random() - 0.5) * 50;
+        data.data[k] = Math.min(255, Math.max(0, data.data[k] + n));
+        data.data[k+1] = Math.min(255, Math.max(0, data.data[k+1] + n));
+        data.data[k+2] = Math.min(255, Math.max(0, data.data[k+2] + n));
       }
-      ctx.putImageData(imgData, 0, 0);
+      ctx.putImageData(data, 0, 0);
 
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(4, 4);
-      return texture;
+      const tex = new THREE.CanvasTexture(cv);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(6, 6);
+      return tex;
     }
 
-    function createSidingTexture() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 256;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, 256, 256);
-
-      // Horizontal siding bevel lines
-      const planks = 16;
-      const plankH = 256 / planks;
-      for (let i = 0; i < planks; i++) {
-        const y = i * plankH;
+    function makeSidingTexture() {
+      const cv = document.createElement('canvas');
+      cv.width = 256; cv.height = 256;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,256,256);
+      for (let i = 0; i < 16; i++) {
         ctx.fillStyle = '#94a3b8';
-        ctx.fillRect(0, y + plankH - 2, 256, 2);
+        ctx.fillRect(0, i * 16 + 14, 256, 2);
       }
-
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(1, 4);
-      return texture;
+      const tex = new THREE.CanvasTexture(cv);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1, 6);
+      return tex;
     }
 
-    const shingleBumpMap = createShingleTexture();
-    const sidingBumpMap = createSidingTexture();
+    const shingleBump = makeShingleTexture();
+    const sidingBump = makeSidingTexture();
 
     // --- Scene Setup ---
-    const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0f172a);
-    scene.fog = new THREE.FogExp2(0x0f172a, 0.015);
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 11, 26);
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(22, 14, 24);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
-    container.appendChild(renderer.domElement);
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
+    controls.target.set(0, 4, 0);
     controls.maxPolarAngle = Math.PI / 2 - 0.05;
-    controls.minDistance = 12;
-    controls.maxDistance = 45;
+    controls.minDistance = 10;
+    controls.maxDistance = 50;
 
-    // --- Lighting Rig ---
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x334155, 0.6);
-    scene.add(hemiLight);
+    // --- Lighting ---
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const sun = new THREE.DirectionalLight(0xfff5ea, 1.4);
+    sun.position.set(30, 45, 25);
+    sun.castShadow = true;
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
+    scene.add(sun);
 
-    const sunLight = new THREE.DirectionalLight(0xfff7ed, 1.4);
-    sunLight.position.set(24, 38, 22);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 0.5;
-    sunLight.shadow.camera.far = 100;
-    sunLight.shadow.bias = -0.0003;
-    scene.add(sunLight);
-
-    // Ground & Driveway
-    const groundGeo = new THREE.PlaneGeometry(120, 120);
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.95 });
-    const ground = new THREE.Mesh(groundGeo, groundMat);
+    // --- Ground ---
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(100, 100),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 })
+    );
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    const driveGeo = new THREE.PlaneGeometry(6.5, 20);
-    const driveMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.75 });
-    const driveway = new THREE.Mesh(driveGeo, driveMat);
+    const driveway = new THREE.Mesh(
+      new THREE.PlaneGeometry(7, 18),
+      new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.75 })
+    );
     driveway.rotation.x = -Math.PI / 2;
     driveway.position.set(5.5, 0.01, 8.5);
     driveway.receiveShadow = true;
     scene.add(driveway);
 
-    // --- Materials with Real PBR & Bump Mapping ---
-    let roofMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1c2024,
-      roughness: 0.8,
+    // --- Dynamic Materials ---
+    const roofMaterial = new THREE.MeshStandardMaterial({
+      color: 0x22252a,
+      roughness: 0.75,
       metalness: 0.1,
-      bumpMap: shingleBumpMap,
-      bumpScale: 0.04
+      bumpMap: shingleBump,
+      bumpScale: 0.03
     });
 
-    let sidingMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf1f5f9,
+    const sidingMaterial = new THREE.MeshStandardMaterial({
+      color: 0xf8fafc,
       roughness: 0.8,
-      bumpMap: sidingBumpMap,
+      bumpMap: sidingBump,
       bumpScale: 0.02
     });
 
-    const gutterMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
-    const trimMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35 });
-    const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, metalness: 0.9 });
-    const doorMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.55 });
-    const foundationMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9 });
+    const trimMaterial = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 });
+    const whiteTrim = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+    const glassMaterial = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, metalness: 0.8 });
 
-    // --- Realistic House Architecture Group ---
-    const houseGroup = new THREE.Group();
+    // --- House Architecture ---
+    const house = new THREE.Group();
 
-    // 1. Concrete Foundation Footing
-    const foundMesh = new THREE.Mesh(new THREE.BoxGeometry(19, 0.8, 11), foundationMat);
-    foundMesh.position.set(2, 0.4, 0);
-    foundMesh.receiveShadow = true;
-    houseGroup.add(foundMesh);
+    // 1. Main Two-Story Body
+    const mainWalls = new THREE.Mesh(new THREE.BoxGeometry(11, 6, 8.5), sidingMaterial);
+    mainWalls.position.set(-2, 3, 0);
+    mainWalls.castShadow = mainWalls.receiveShadow = true;
+    house.add(mainWalls);
 
-    // 2. Main Two-Story Body
-    const mainMesh = new THREE.Mesh(new THREE.BoxGeometry(11, 6.2, 9), sidingMaterial);
-    mainMesh.position.set(-1.8, 3.8, 0);
-    mainMesh.castShadow = true;
-    mainMesh.receiveShadow = true;
-    houseGroup.add(mainMesh);
+    // 2. Garage Wing
+    const garageWalls = new THREE.Mesh(new THREE.BoxGeometry(7, 4.5, 8.5), sidingMaterial);
+    garageWalls.position.set(5.5, 2.25, 0.5);
+    garageWalls.castShadow = garageWalls.receiveShadow = true;
+    house.add(garageWalls);
 
-    // 3. Garage & Front Porch Wing
-    const garageMesh = new THREE.Mesh(new THREE.BoxGeometry(7, 4.8, 8.5), sidingMaterial);
-    garageMesh.position.set(5.5, 3.1, 0.8);
-    garageMesh.castShadow = true;
-    garageMesh.receiveShadow = true;
-    houseGroup.add(garageMesh);
+    // 3. Gable Profile Function (Creates an authentic sloped roof with overhangs)
+    function buildGableRoof(width, height, depth) {
+      const shape = new THREE.Shape();
+      const halfW = width / 2;
+      shape.moveTo(-halfW, 0);
+      shape.lineTo(0, height);
+      shape.lineTo(halfW, 0);
+      shape.closePath();
 
-    // 4. Main Roof (Multi-pitch with Overhang Eaves)
-    const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(9.6, 4.4, 4), roofMaterial);
-    mainRoof.position.set(-1.8, 8.9, 0);
-    mainRoof.rotation.y = Math.PI / 4;
-    mainRoof.scale.set(1.18, 1, 0.88);
-    mainRoof.castShadow = true;
-    houseGroup.add(mainRoof);
+      const extrudeSettings = { depth: depth, bevelEnabled: false };
+      const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      geo.center();
+      return geo;
+    }
 
-    // 5. Garage Roof
-    const garageRoof = new THREE.Mesh(new THREE.ConeGeometry(6.2, 3.2, 4), roofMaterial);
-    garageRoof.position.set(5.5, 6.9, 0.8);
-    garageRoof.rotation.y = Math.PI / 4;
-    garageRoof.scale.set(1.12, 1, 0.88);
-    garageRoof.castShadow = true;
-    houseGroup.add(garageRoof);
+    // Main Roof
+    const mainRoofGeo = buildGableRoof(12.6, 4.2, 9.6);
+    const mainRoofMesh = new THREE.Mesh(mainRoofGeo, roofMaterial);
+    mainRoofMesh.position.set(-2, 7.8, 0);
+    mainRoofMesh.castShadow = true;
+    house.add(mainRoofMesh);
 
-    // 6. Gutters & Fascia Line Accents
-    const gutter1 = new THREE.Mesh(new THREE.BoxGeometry(11.4, 0.25, 0.25), gutterMat);
-    gutter1.position.set(-1.8, 6.8, 4.6);
-    houseGroup.add(gutter1);
+    // Garage Roof
+    const garageRoofGeo = buildGableRoof(8.4, 3.0, 9.6);
+    const garageRoofMesh = new THREE.Mesh(garageRoofGeo, roofMaterial);
+    garageRoofMesh.position.set(5.5, 5.8, 0.5);
+    garageRoofMesh.castShadow = true;
+    house.add(garageRoofMesh);
 
-    const gutter2 = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.25, 0.25), gutterMat);
-    gutter2.position.set(5.5, 5.4, 5.2);
-    houseGroup.add(gutter2);
-
-    // 7. Brick Chimney
+    // Chimney
     const chimney = new THREE.Mesh(
-      new THREE.BoxGeometry(1.3, 5.6, 1.3),
+      new THREE.BoxGeometry(1.4, 4.5, 1.4),
       new THREE.MeshStandardMaterial({ color: 0x853a2f, roughness: 0.9 })
     );
-    chimney.position.set(-5, 8.6, -1.8);
+    chimney.position.set(-5.5, 8.2, -1.5);
     chimney.castShadow = true;
-    houseGroup.add(chimney);
+    house.add(chimney);
 
-    // 8. Garage Panel Door
-    const garageDoor = new THREE.Mesh(new THREE.BoxGeometry(5.4, 3.6, 0.15), trimMat);
-    garageDoor.position.set(5.5, 2.5, 5.1);
-    houseGroup.add(garageDoor);
+    // Doors & Windows
+    const garageDoor = new THREE.Mesh(new THREE.BoxGeometry(5.4, 3.4, 0.15), trimMaterial);
+    garageDoor.position.set(5.5, 1.7, 4.8);
+    house.add(garageDoor);
 
-    // 9. Modern Front Door
-    const frontDoor = new THREE.Mesh(new THREE.BoxGeometry(1.9, 3.8, 0.2), doorMat);
-    frontDoor.position.set(-1.8, 2.6, 4.6);
-    houseGroup.add(frontDoor);
+    const frontDoor = new THREE.Mesh(
+      new THREE.BoxGeometry(1.8, 3.6, 0.2),
+      new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.6 })
+    );
+    frontDoor.position.set(-2, 1.8, 4.3);
+    house.add(frontDoor);
 
-    // 10. Architectural Windows with Trim Frames
-    function createDetailedWindow(x, y, z) {
-      const winGroup = new THREE.Group();
-      // Glass
-      const glass = new THREE.Mesh(new THREE.BoxGeometry(2.1, 2.1, 0.1), windowGlassMat);
-      winGroup.add(glass);
-      // Window frame trim
-      const frame = new THREE.Mesh(new THREE.BoxGeometry(2.3, 2.3, 0.05), gutterMat);
-      frame.position.z = -0.03;
-      winGroup.add(frame);
-      winGroup.position.set(x, y, z);
-      return winGroup;
+    function addWindow(x, y, z) {
+      const g = new THREE.Group();
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(2, 2, 0.1), glassMaterial));
+      const f = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.2, 0.05), whiteTrim);
+      f.position.z = -0.04;
+      g.add(f);
+      g.position.set(x, y, z);
+      house.add(g);
     }
-    houseGroup.add(createDetailedWindow(-5, 4.2, 4.6));
-    houseGroup.add(createDetailedWindow(1.4, 4.2, 4.6));
-    houseGroup.add(createDetailedWindow(-1.8, 5.5, 4.6));
+    addWindow(-5.2, 3.5, 4.3);
+    addWindow(1.2, 3.5, 4.3);
+    addWindow(-2, 5.0, 4.3);
 
-    scene.add(houseGroup);
+    scene.add(house);
 
-    // --- Interactive Control Handlers ---
-    let currentShingleColor = '#1c2024';
-
-    function setRoofColor(hex, name, roughness, el) {
-      currentShingleColor = hex;
+    // --- Interactive Functions ---
+    function setRoofColor(hex, name, el) {
       roofMaterial.color.set(hex);
-      roofMaterial.roughness = roughness;
       document.getElementById('colorTag').innerText = name;
-      document.querySelectorAll('.control-block:nth-child(3) .swatch').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.control-block:nth-child(2) .swatch').forEach(s => s.classList.remove('active'));
       el.classList.add('active');
     }
 
     function setSidingColor(hex, name, el) {
       sidingMaterial.color.set(hex);
       document.getElementById('sidingTag').innerText = name;
-      document.querySelectorAll('.control-block:nth-child(4) .swatch').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.control-block:nth-child(3) .swatch').forEach(s => s.classList.remove('active'));
       el.classList.add('active');
     }
 
@@ -486,72 +369,27 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
 
-      const priceDisplay = document.getElementById('priceDisplay');
-      const priceDetail = document.getElementById('priceDetail');
-      const systemTag = document.getElementById('systemTag');
-
       if (type === 'shingle') {
-        systemTag.innerText = 'Architectural Shingles';
-        roofMaterial.roughness = 0.8;
+        document.getElementById('systemTag').innerText = 'Architectural Shingles';
+        roofMaterial.roughness = 0.75;
         roofMaterial.metalness = 0.1;
-        roofMaterial.bumpScale = 0.04;
-        roofMaterial.bumpMap = shingleBumpMap;
-        roofMaterial.needsUpdate = true;
-        priceDisplay.innerText = '$12,400 – $14,200';
-        priceDetail.innerText = 'Includes 50-Yr Architectural Warranty + Complete Tear-Off & Underlayment';
+        roofMaterial.bumpScale = 0.03;
+        document.getElementById('priceDisplay').innerText = '$12,400 – $14,200';
       } else {
-        systemTag.innerText = 'Standing Seam Metal';
-        roofMaterial.roughness = 0.32;
+        document.getElementById('systemTag').innerText = 'Standing Seam Metal';
+        roofMaterial.roughness = 0.3;
         roofMaterial.metalness = 0.85;
-        roofMaterial.bumpScale = 0.01;
-        roofMaterial.needsUpdate = true;
-        priceDisplay.innerText = '$19,800 – $23,500';
-        priceDetail.innerText = 'Premium 24-Gauge Galvalume Steel with 70-Yr Severe Weather Rating';
+        roofMaterial.bumpScale = 0.008;
+        document.getElementById('priceDisplay').innerText = '$19,800 – $23,500';
       }
     }
 
-    function setEnvironment(preset, el) {
-      document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-
-      if (preset === 'noon') {
-        scene.background.set(0x0f172a);
-        scene.fog.color.set(0x0f172a);
-        sunLight.color.set(0xfff7ed);
-        sunLight.intensity = 1.4;
-        renderer.toneMappingExposure = 1.0;
-      } else if (preset === 'sunset') {
-        scene.background.set(0x2d1b28);
-        scene.fog.color.set(0x2d1b28);
-        sunLight.color.set(0xfb923c);
-        sunLight.intensity = 1.6;
-        renderer.toneMappingExposure = 1.1;
-      } else if (preset === 'storm') {
-        scene.background.set(0x111827);
-        scene.fog.color.set(0x111827);
-        sunLight.color.set(0x94a3b8);
-        sunLight.intensity = 0.7;
-        renderer.toneMappingExposure = 0.85;
-      }
-    }
-
-    function toggleModal(show) {
-      document.getElementById('leadModal').style.display = show ? 'flex' : 'none';
-    }
-
-    function submitLead() {
-      alert("Homeowner Quote Requested! In the contractor version, this instantly sends an SMS with chosen specifications to the sales team.");
-      toggleModal(false);
-    }
-
-    // Window Resize Event
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Render Animation Loop
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
