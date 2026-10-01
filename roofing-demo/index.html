@@ -1,401 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Apex 3D Exterior & Roofing Visualizer | Contractor Pro Suite</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <style>
-    :root {
-      --amber: #f59e0b;
-      --bg-dark: #0a0e17;
-      --panel-bg: rgba(15, 23, 42, 0.92);
-      --border: rgba(255, 255, 255, 0.12);
-      --text: #f9fafb;
-      --text-muted: #9ca3af;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text); overflow: hidden; width: 100vw; height: 100vh; position: relative; }
-
-    header {
-      position: absolute; top: 0; left: 0; width: 100%; z-index: 30;
-      padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(180deg, rgba(10,14,23,0.95) 0%, transparent 100%);
-      pointer-events: none;
-    }
-    .brand-wrap { display: flex; align-items: center; gap: 10px; pointer-events: auto; }
-    .brand-title { font-size: 1.15rem; font-weight: 800; color: #fff; }
-    .brand-title span { color: var(--amber); }
-    .badge {
-      background: rgba(245, 158, 11, 0.15); border: 1px solid var(--amber); color: #fde68a;
-      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
-    }
-
-    #canvas-container { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 1; }
-
-    .visualizer-ui {
-      position: absolute; top: 75px; right: 24px; width: 350px; max-height: calc(100vh - 95px);
-      background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
-      border-radius: 18px; padding: 20px; z-index: 25; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-    }
-    .visualizer-ui::-webkit-scrollbar { width: 4px; }
-    .visualizer-ui::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-
-    .control-block { margin-bottom: 16px; }
-    .control-label {
-      display: flex; justify-content: space-between; font-size: 0.74rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;
-    }
-    .tag { color: var(--amber); font-weight: 600; text-transform: none; }
-
-    .tab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .tab-btn {
-      background: #1e293b; border: 1px solid var(--border); color: #fff;
-      padding: 9px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
-    }
-    .tab-btn.active { background: rgba(245, 158, 11, 0.16); border-color: var(--amber); color: #fbbf24; }
-
-    .swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .swatch {
-      height: 38px; border-radius: 8px; border: 2px solid transparent; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700;
-      transition: transform 0.2s;
-    }
-    .swatch:hover { transform: translateY(-2px); }
-    .swatch.active { border-color: #fff; transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
-
-    .estimate-card {
-      background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px; margin-top: 14px;
-    }
-    .est-cost { font-size: 1.4rem; font-weight: 800; color: #38bdf8; margin: 2px 0; }
-
-    .btn-submit {
-      width: 100%; margin-top: 14px; background: var(--amber); color: #000;
-      font-weight: 800; font-size: 0.88rem; padding: 12px; border: none; border-radius: 8px;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .btn-submit:hover { background: #d97706; color: #fff; }
-
-    .hint {
-      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border);
-      padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; color: #cbd5e1;
-      pointer-events: none; z-index: 10;
-    }
-
-    @media (max-width: 768px) {
-      .visualizer-ui { top: auto; bottom: 0; left: 0; right: 0; width: 100%; max-height: 48vh; border-radius: 20px 20px 0 0; }
-      .hint { display: none; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Summit Ridge Roofing | Design Your Roof in 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f5f3;--ink:#1b2227;--mut:#5b676e;--pan:#fff;--line:#d9dedf;--acc:#17604a;--accink:#fff;--glass:rgba(255,255,255,.88);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11171a;--ink:#e9eeee;--mut:#9aa8ad;--pan:#192125;--line:#2b373c;--acc:#5fc4a0;--accink:#0a1a14;--glass:rgba(25,33,37,.88)}}
+:root[data-theme="dark"]{--bg:#11171a;--ink:#e9eeee;--mut:#9aa8ad;--pan:#192125;--line:#2b373c;--acc:#5fc4a0;--accink:#0a1a14;--glass:rgba(25,33,37,.88)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+a{color:inherit}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--glass);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav b{font-size:1.1rem;font-weight:800}.nav nav{display:flex;gap:22px;align-items:center}.nav nav a{text-decoration:none;font-size:.95rem}
+.btn{display:inline-block;border:0;border-radius:10px;background:var(--acc);color:var(--accink);font-family:inherit;font-weight:600;font-size:1rem;padding:12px 20px;cursor:pointer;text-decoration:none}
+.btn:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.hero{position:relative;display:grid;grid-template-columns:1fr 380px;height:calc(100svh - 58px);min-height:560px}
+.stage{position:relative;overflow:hidden;background:#9bc0e0}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.tag{position:absolute;left:24px;top:24px;max-width:430px;background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:18px 20px;backdrop-filter:blur(6px)}
+.tag h1{margin:0 0 6px;font-size:2rem;line-height:1.08;font-weight:800}.tag p{margin:0 0 12px;color:var(--mut)}
+.hint{position:absolute;left:24px;bottom:18px;font-size:.85rem;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--mut)}
+.cfg{background:var(--pan);border-left:1px solid var(--line);padding:20px 22px;overflow-y:auto}
+.cfg h2{margin:0 0 14px;font-size:1.15rem}
+fieldset{border:0;padding:0;margin:0 0 16px}
+legend{padding:0;margin-bottom:8px;font-weight:600;display:flex;justify-content:space-between;width:100%;font-size:.95rem}legend span{font-weight:400;color:var(--mut)}
+.sw{display:flex;flex-wrap:wrap;gap:9px}
+.sw button{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--c);padding:0;cursor:pointer}
+.sw button[aria-pressed="true"]{outline:3px solid var(--acc);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:transparent;color:var(--ink);font-family:inherit;font-size:.88rem;padding:9px 6px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--acc);color:var(--accink)}
+section{padding:72px 24px}.wrap{max-width:1040px;margin:0 auto}
+h2.t{font-size:2.1rem;line-height:1.1;margin:0 0 10px;font-weight:800}.sub{color:var(--mut);max-width:60ch;margin:0 0 32px}
+.alt{background:var(--pan);border-block:1px solid var(--line)}
+.svc{display:grid;grid-template-columns:repeat(2,1fr);gap:0 48px}
+.svc div{padding:18px 0;border-top:1px solid var(--line)}.svc h3{margin:0 0 4px;font-size:1.15rem}.svc p{margin:0;color:var(--mut)}
+.est{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.big{font-size:2.8rem;font-weight:800;line-height:1.05;margin:6px 0}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;counter-reset:s;padding:0;list-style:none;margin:0}
+.steps li{counter-increment:s;border-top:3px solid var(--acc);padding-top:12px}.steps li::before{content:"Step " counter(s);display:block;color:var(--mut);font-size:.85rem}.steps b{display:block;margin:2px 0 4px}
+.rev{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.rev blockquote{margin:0;font-size:1.05rem}.rev cite{display:block;margin-top:8px;color:var(--mut);font-style:normal;font-size:.9rem}
+details{border-top:1px solid var(--line);padding:14px 0}summary{font-weight:600;cursor:pointer}details p{color:var(--mut);margin:8px 0 0}
+form{display:grid;gap:12px;max-width:520px}
+input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+.lywrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.lyscene{height:400px;perspective:1100px;display:flex;align-items:center;justify-content:center}
+#lyr{position:relative;width:280px;height:180px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-38deg)}
+.ly{position:absolute;inset:0;border-radius:6px;background-color:var(--lc);border:1px solid rgba(0,0,0,.35);transform:translateZ(calc((4 - var(--i)) * (10px + var(--ex,.6) * 36px)));transition:transform .15s,outline-color .15s;outline:3px solid transparent}
+.ly.on{outline-color:var(--acc)}
+.ly[data-i="0"]{background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 15px)}
+.ly[data-i="1"]{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.12) 0 3px,transparent 3px 12px)}
+.ly[data-i="3"]{background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 46px)}
+.ly[data-i="4"]{background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.4) 0 7px,transparent 7px 42px)}
+.lyl{margin-top:14px}
+.lyl button{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;padding:12px 4px;cursor:pointer}
+.lyl button span{display:block;color:var(--mut);font-size:.92rem}
+.lyl button[aria-pressed="true"]{border-top:3px solid var(--acc);padding-top:10px}
+@media (max-width:860px){.lywrap{grid-template-columns:1fr}.lyscene{height:300px}#lyr{width:220px;height:140px}}
+footer{padding:28px 24px;text-align:center;color:var(--mut);font-size:.9rem}
+.call{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:6;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+@media (max-width:860px){.hero{grid-template-columns:1fr;height:auto}.stage{height:62svh}.tag{left:12px;top:12px;right:12px;padding:12px 14px}.tag h1{font-size:1.3rem}.tag p{display:none}.hint{display:none}.cfg{border-left:0}.nav nav a.h{display:none}.svc,.est,.rev{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}section{padding:48px 20px}}
+</style>
 </head>
 <body>
+<header class="nav"><b data-b="name"></b><nav><a class="h" href="#services">Services</a><a class="h" href="#estimate">Estimate</a><a class="h" href="#faq">FAQ</a><a class="btn" data-tel href="#contact"><span data-b="phone"></span></a></nav></header>
 
-  <header>
-    <div class="brand-wrap">
-      <div class="brand-title">🏠 PrecisionRoof <span>3D Studio</span></div>
-      <span class="badge">Live 3D Configurator</span>
-    </div>
-  </header>
-
-  <div id="canvas-container"></div>
-  <div class="hint">🖱️️ Left-Click + Drag to rotate 360° · Right-Click to pan · Scroll to zoom</div>
-
-  <div class="visualizer-ui">
-    <h3 style="font-size: 1.05rem; margin-bottom: 2px;">Exterior Specifier</h3>
-    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px;">Preview actual shingle & siding combinations live.</p>
-
-    <!-- System -->
-    <div class="control-block">
-      <div class="control-label">Roof System <span class="tag" id="systemTag">Architectural Shingles</span></div>
-      <div class="tab-grid">
-        <button class="tab-btn active" onclick="setMaterialType('shingle', this)">Asphalt Shingle</button>
-        <button class="tab-btn" onclick="setMaterialType('metal', this)">Standing Seam Metal</button>
-      </div>
-    </div>
-
-    <!-- Shingles -->
-    <div class="control-block">
-      <div class="control-label">Roof Color <span class="tag" id="colorTag">Charcoal Black</span></div>
-      <div class="swatch-grid">
-        <div class="swatch active" style="background:#22252a; color:#fff;" onclick="setRoofColor('#22252a', 'Charcoal Black', this)">Charcoal</div>
-        <div class="swatch" style="background:#4b5563; color:#fff;" onclick="setRoofColor('#4b5563', 'Pewter Gray', this)">Pewter</div>
-        <div class="swatch" style="background:#5c4033; color:#fff;" onclick="setRoofColor('#5c4033', 'Barkwood', this)">Barkwood</div>
-        <div class="swatch" style="background:#1e3a5f; color:#fff;" onclick="setRoofColor('#1e3a5f', 'Pacific Blue', this)">Blue</div>
-      </div>
-    </div>
-
-    <!-- Siding -->
-    <div class="control-block">
-      <div class="control-label">Home Siding <span class="tag" id="sidingTag">Alabaster White</span></div>
-      <div class="swatch-grid">
-        <div class="swatch active" style="background:#f8fafc; color:#0f172a;" onclick="setSidingColor('#f8fafc', 'Alabaster White', this)">Alabaster</div>
-        <div class="swatch" style="background:#64748b; color:#fff;" onclick="setSidingColor('#64748b', 'Slate Gray', this)">Slate</div>
-        <div class="swatch" style="background:#b8aea1; color:#0f172a;" onclick="setSidingColor('#b8aea1', 'Warm Greige', this)">Greige</div>
-        <div class="swatch" style="background:#1e293b; color:#fff;" onclick="setSidingColor('#1e293b', 'Deep Onyx', this)">Onyx</div>
-      </div>
-    </div>
-
-    <!-- Estimate -->
-    <div class="estimate-card">
-      <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Estimated Scope (2,600 sq.ft)</div>
-      <div class="est-cost" id="priceDisplay">$12,400 – $14,200</div>
-      <div style="font-size: 0.72rem; color: #94a3b8;" id="priceDetail">Includes 50-Yr Architectural Warranty + Complete Tear-Off</div>
-    </div>
-
-    <button class="btn-submit" onclick="alert('Demo Specification Saved! In client builds, this triggers an instant SMS quote to the contractor.')">Request Contractor Estimate</button>
+<main>
+<div class="hero">
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="Interactive 3D house. Drag to rotate, scroll to zoom."></canvas>
+    <div class="tag"><h1>Design your new roof before the first shingle comes off.</h1><p>Try materials, colors and lighting on a live 3D home. Then get a free, no-pressure quote.</p><a class="btn" href="#contact">Get my free quote</a></div>
+    <div class="hint">Drag to rotate. Scroll or pinch to zoom.</div>
   </div>
+  <div class="cfg">
+    <h2>Build your look</h2>
+    <fieldset><legend>Roof material</legend><div class="seg" id="g-mat"></div></fieldset>
+    <fieldset><legend>Roof color <span id="n-roof"></span></legend><div class="sw" id="g-roof"></div></fieldset>
+    <fieldset><legend>Siding <span id="n-wall"></span></legend><div class="sw" id="g-wall"></div></fieldset>
+    <fieldset><legend>Trim and gutters <span id="n-trim"></span></legend><div class="sw" id="g-trim"></div></fieldset>
+    <fieldset><legend>Door and shutters <span id="n-door"></span></legend><div class="sw" id="g-door"></div></fieldset>
+    <fieldset><legend>Time of day</legend><div class="seg" id="g-time"></div></fieldset>
+    <fieldset><legend>Storm damage <span id="n-dmg">None</span></legend><input type="range" id="dmg" min="0" max="100" value="0" aria-label="Storm damage preview"></fieldset>
+    <p style="margin:0;color:var(--mut);font-size:.9rem">Your look: <b id="look" style="color:var(--ink)"></b></p>
+  </div>
+</div>
 
-  <script>
-    // --- Procedural Textures ---
-    function makeShingleTexture() {
-      const cv = document.createElement('canvas');
-      cv.width = 512; cv.height = 512;
-      const ctx = cv.getContext('2d');
-      ctx.fillStyle = '#777777'; ctx.fillRect(0,0,512,512);
+<section id="services"><div class="wrap"><h2 class="t">Everything on top of your home, handled.</h2><p class="sub">One licensed, insured crew from inspection to final cleanup, serving <span data-b="city"></span> and nearby.</p>
+<div class="svc">
+<div><h3>Roof replacement</h3><p>Full tear-off, new decking where needed, and a clean install with a written warranty.</p></div>
+<div><h3>Repairs and leaks</h3><p>Fast diagnosis of leaks, flashing, vents and missing shingles, usually fixed in a day.</p></div>
+<div><h3>Storm and hail damage</h3><p>We document the damage and work directly with your insurance adjuster.</p></div>
+<div><h3>Gutters and downspouts</h3><p>Seamless gutters and guards that carry water away from your foundation.</p></div>
+<div><h3>Inspections</h3><p>Photo-backed reports for buyers, sellers and anyone planning ahead.</p></div>
+<div><h3>Siding and trim</h3><p>Fresh siding, soffit and fascia that match your new roof.</p></div>
+</div></div></section>
 
-      const rows = 16, rowH = 512 / rows;
-      for (let i = 0; i < rows; i++) {
-        const y = i * rowH;
-        ctx.fillStyle = '#222222';
-        ctx.fillRect(0, y + rowH - 3, 512, 3);
-        const cols = 8, colW = 512 / cols, offset = (i % 2) * (colW / 2);
-        for (let j = 0; j <= cols; j++) {
-          ctx.fillStyle = '#333333';
-          ctx.fillRect(j * colW - offset, y, 2, rowH);
-        }
-      }
-      const data = ctx.getImageData(0,0,512,512);
-      for (let k = 0; k < data.data.length; k += 4) {
-        const n = (Math.random() - 0.5) * 50;
-        data.data[k] = Math.min(255, Math.max(0, data.data[k] + n));
-        data.data[k+1] = Math.min(255, Math.max(0, data.data[k+1] + n));
-        data.data[k+2] = Math.min(255, Math.max(0, data.data[k+2] + n));
-      }
-      ctx.putImageData(data, 0, 0);
+<section id="estimate" class="alt"><div class="wrap est">
+<div><h2 class="t">A ballpark price in seconds.</h2><p class="sub" style="margin:0">Slide to your roof size. Uses the material you picked above. Your written quote after a free inspection is the real number.</p></div>
+<div><label for="sq">Roof size: <b id="sqv"></b> sq ft</label><input type="range" id="sq" min="1000" max="5000" step="100" value="2400"><div style="color:var(--mut)" id="estm"></div><div class="big" id="estp"></div><div style="color:var(--mut);font-size:.9rem">Sample rates for this demo. Replace with the company's real pricing.</div></div>
+</div></section>
 
-      const tex = new THREE.CanvasTexture(cv);
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(6, 6);
-      return tex;
-    }
+<section><div class="wrap"><h2 class="t">How it works</h2><p class="sub">No surprises from first call to final walkthrough.</p>
+<ol class="steps"><li><b>Free inspection</b>We check the roof and photograph problem areas.</li><li><b>Clear written quote</b>Material, labor and timeline in one page.</li><li><b>Install in 1 to 3 days</b>Protected landscaping and daily cleanup.</li><li><b>Final walkthrough</b>Warranty paperwork and a magnet sweep for nails.</li></ol></div></section>
 
-    function makeSidingTexture() {
-      const cv = document.createElement('canvas');
-      cv.width = 256; cv.height = 256;
-      const ctx = cv.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,256,256);
-      for (let i = 0; i < 16; i++) {
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillRect(0, i * 16 + 14, 256, 2);
-      }
-      const tex = new THREE.CanvasTexture(cv);
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(1, 6);
-      return tex;
-    }
+<section><div class="wrap lywrap"><div class="lyscene"><div id="lyr" aria-hidden="true"></div></div><div><h2 class="t">What's under your shingles.</h2><p class="sub" style="margin-bottom:16px">A roof is five layers working together. Tap a layer, or pull them apart.</p><label for="ex">Pull the layers apart</label><input type="range" id="ex" min="0" max="100" value="60"><div class="lyl" id="lylist"></div></div></div></section>
 
-    const shingleBump = makeShingleTexture();
-    const sidingBump = makeSidingTexture();
+<section class="alt"><div class="wrap"><h2 class="t">Homeowners say</h2><p class="sub">Sample reviews for the demo. Swap in real ones.</p>
+<div class="rev"><blockquote>"They found the leak two other roofers missed and had it fixed the next morning."<cite>Karen M.</cite></blockquote><blockquote>"The 3D tool helped us pick the color. The finished roof looks exactly like it."<cite>David and Priya R.</cite></blockquote><blockquote>"Handled the hail claim start to finish. We only paid our deductible."<cite>James T.</cite></blockquote></div></div></section>
 
-    // --- Scene Setup ---
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0f172a);
+<section id="faq"><div class="wrap" style="max-width:760px"><h2 class="t">Common questions</h2>
+<details><summary>How long does a roof replacement take?</summary><p>Most homes take one to three days, depending on size and weather.</p></details>
+<details><summary>Do you help with insurance claims?</summary><p>Yes. We document storm damage and meet your adjuster on the roof.</p></details>
+<details><summary>What warranty do I get?</summary><p>Manufacturer material warranty plus our own workmanship warranty, in writing.</p></details>
+<details><summary>Is the inspection really free?</summary><p>Yes. No obligation and no pressure.</p></details></div></section>
 
-    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(22, 14, 24);
+<section id="contact" class="alt"><div class="wrap"><h2 class="t">Get your free quote</h2><p class="sub">Your chosen look is attached automatically.</p>
+<form id="f"><input required placeholder="Full name" aria-label="Full name"><input required type="tel" placeholder="Phone" aria-label="Phone"><input placeholder="Property address" aria-label="Property address"><textarea rows="3" placeholder="Anything we should know? (leaks, storm damage, timeline)" aria-label="Message"></textarea><button class="btn" type="submit">Request my quote</button><p id="ok" role="status" style="margin:0;color:var(--acc);font-weight:600"></p></form></div></section>
+</main>
+<footer>&copy; <span data-b="name"></span> &middot; Licensed and insured &middot; <span data-b="city"></span></footer>
+<a class="btn call" data-tel href="#contact">Call <span data-b="phone"></span></a>
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+/* ===== EDIT PER CLIENT ===== */
+var BRAND={name:'Summit Ridge Roofing',phone:'(555) 014-2290',city:'Dallas, TX'};
+/* =========================== */
+document.querySelectorAll('[data-b]').forEach(function(e){e.textContent=BRAND[e.dataset.b]});
+document.querySelectorAll('[data-tel]').forEach(function(e){e.href='tel:'+BRAND.phone.replace(/\D/g,'')});
+var T=THREE;
+var OPT={
+ mat:['Asphalt shingle','Metal seam','Clay tile'],
+ roof:[['Charcoal','#3b3e42'],['Slate Gray','#69757f'],['Weathered Wood','#7d6c58'],['Desert Tan','#b49d7a'],['Barn Red','#8c3a31'],['Forest Green','#3e5a45'],['Midnight Blue','#2f4059'],['Terracotta','#b2593b']],
+ wall:[['Warm White','#ece9e0'],['Sand','#d6c7a4'],['Sage','#a7b49e'],['Harbor Blue','#8b9eb0'],['Clay','#ad7760'],['Graphite','#4a5157']],
+ trim:[['White','#f5f3ee'],['Cream','#e3d9bf'],['Bronze','#5b4a3b'],['Black','#25282b']],
+ door:[['Black','#1f2326'],['Navy','#26406b'],['Barn Red','#8f2d2a'],['Natural Oak','#9a6b3f'],['Forest','#2f5a43']],
+ time:['Day','Golden hour','Dusk']
+};
+var S={mat:0,roof:0,wall:1,trim:0,door:1,time:0};
+var TP=[{top:'#5b97d4',bot:'#dbe8f2',sun:'#fff3df',si:1.3,hi:.55,pos:[9,13,8],glow:0},{top:'#46639f',bot:'#f6c692',sun:'#ffac63',si:1.05,hi:.35,pos:[13,4.5,5],glow:.35},{top:'#0f1938',bot:'#6a5a8e',sun:'#8097ff',si:.35,hi:.3,pos:[-7,6,7],glow:1}];
 
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.target.set(0, 4, 0);
-    controls.maxPolarAngle = Math.PI / 2 - 0.05;
-    controls.minDistance = 10;
-    controls.maxDistance = 50;
+var canvas=document.getElementById('c'),stage=document.getElementById('stage');
+var R=new T.WebGLRenderer({canvas:canvas,antialias:true});
+R.setPixelRatio(Math.min(devicePixelRatio,2));R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;
+R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.15;
+var scene=new T.Scene();scene.fog=new T.Fog(0xdbe8f2,32,70);
+var cam=new T.PerspectiveCamera(38,1,.1,300);
+var hemi=new T.HemisphereLight(0xffffff,0x6f8a5c,.55);scene.add(hemi);
+var sun=new T.DirectionalLight(0xffffff,1);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;
+var sc=sun.shadow.camera;sc.left=-13;sc.right=13;sc.top=13;sc.bottom=-13;sc.far=60;scene.add(sun);
+var skyMat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,uniforms:{top:{value:new T.Color()},bot:{value:new T.Color()}},
+ vertexShader:'varying float h;void main(){h=normalize(position).y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+ fragmentShader:'uniform vec3 top;uniform vec3 bot;varying float h;void main(){gl_FragColor=vec4(mix(bot,top,smoothstep(0.,.5,h)),1.);}'});
+scene.add(new T.Mesh(new T.SphereGeometry(150,24,16),skyMat));
 
-    // --- Lighting ---
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const sun = new THREE.DirectionalLight(0xfff5ea, 1.4);
-    sun.position.set(30, 45, 25);
-    sun.castShadow = true;
-    sun.shadow.mapSize.width = 2048;
-    sun.shadow.mapSize.height = 2048;
-    scene.add(sun);
+function cv(w,h,fn,rx,ry){var c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);var t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=8;t.repeat.set(rx||1,ry||1);return t}
+var rnd=Math.random;
+var TX={
+ shingle:cv(256,256,function(g){for(var r=0;r<16;r++){var o=(r%2)*16;for(var x=-32;x<256;x+=32){var v=190+rnd()*55|0;g.fillStyle='rgb('+v+','+v+','+v+')';g.fillRect(x+o,r*16,31,15);}g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,r*16+14,256,2);}for(var i=0;i<1800;i++){g.fillStyle='rgba(0,0,0,'+rnd()*.12+')';g.fillRect(rnd()*256,rnd()*256,2,2);}},3,1),
+ metal:cv(256,256,function(g){for(var x=0;x<256;x+=64){var gr=g.createLinearGradient(x,0,x+64,0);gr.addColorStop(0,'#bbb');gr.addColorStop(.06,'#fff');gr.addColorStop(.12,'#e6e6e6');gr.addColorStop(.9,'#f0f0f0');gr.addColorStop(1,'#999');g.fillStyle=gr;g.fillRect(x,0,64,256);}for(var i=0;i<400;i++){g.fillStyle='rgba(0,0,0,.04)';g.fillRect(rnd()*256,rnd()*256,1,30);}},3,1),
+ tile:cv(256,256,function(g){for(var r=0;r<4;r++)for(var c=0;c<8;c++){var x=c*32+(r%2)*16-16,y=r*64;var gr=g.createLinearGradient(x,0,x+32,0);gr.addColorStop(0,'#8a8a8a');gr.addColorStop(.5,'#fff');gr.addColorStop(1,'#8a8a8a');g.fillStyle=gr;g.fillRect(x,y,32,62);g.fillStyle='rgba(0,0,0,.5)';g.fillRect(x,y+58,32,6);}},3,1),
+ siding:cv(128,32,function(g,w,h){var gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#fff');gr.addColorStop(.8,'#e8e8e8');gr.addColorStop(.93,'#9c9c9c');gr.addColorStop(1,'#666');g.fillStyle=gr;g.fillRect(0,0,w,h);for(var i=0;i<60;i++){g.fillStyle='rgba(0,0,0,.035)';g.fillRect(0,rnd()*h,w,1);}},1,14),
+ brick:cv(128,128,function(g){g.fillStyle='#b5aca4';g.fillRect(0,0,128,128);for(var r=0;r<16;r++)for(var c=-1;c<4;c++){var v=rnd()*40|0;g.fillStyle='rgb('+(130+v)+','+(66+v/2)+','+(52+v/2)+')';g.fillRect(c*32+(r%2)*16+1,r*8+1,30,6);}},1,2),
+ grass:cv(256,256,function(g){g.fillStyle='#6d9a58';g.fillRect(0,0,256,256);for(var i=0;i<5000;i++){var v=rnd()*60|0;g.fillStyle='rgba('+(60+v)+','+(110+v)+','+(50+v/2)+',.5)';g.fillRect(rnd()*256,rnd()*256,2,3);}},14,14)
+};
+function M(c,r,o){o=o||{};o.color=c;o.roughness=r;return new T.MeshStandardMaterial(o)}
+var roofM=M('#3b3e42',.95,{map:TX.shingle,bumpMap:TX.shingle,bumpScale:1.5});
+var wallM=M('#d6c7a4',.9,{map:TX.siding,bumpMap:TX.siding,bumpScale:1.2});
+var gabM=M('#d6c7a4',.9,{map:TX.siding.clone(),bumpScale:1.2});gabM.map.needsUpdate=true;gabM.map.repeat.set(1,5);
+var doorM=M('#26406b',.5),trimM=M('#f5f3ee',.6);
+var glassM=M('#9dbfd2',.08,{metalness:.4,emissive:0xffc977,emissiveIntensity:0});
+var brickM=M('#fff',1,{map:TX.brick,bumpMap:TX.brick,bumpScale:2});
+var concM=M('#bdbab2',1),goldM=M('#c9a24a',.3,{metalness:.9});
 
-    // --- Ground ---
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(100, 100),
-      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 })
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
-    scene.add(ground);
+function box(w,h,d,m,x,y,z,p){var o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;(p||scene).add(o);return o}
+var gnd=new T.Mesh(new T.CircleGeometry(80,48),new T.MeshStandardMaterial({map:TX.grass,roughness:1}));gnd.rotation.x=-Math.PI/2;gnd.receiveShadow=true;scene.add(gnd);
 
-    const driveway = new THREE.Mesh(
-      new THREE.PlaneGeometry(7, 18),
-      new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.75 })
-    );
-    driveway.rotation.x = -Math.PI / 2;
-    driveway.position.set(5.5, 0.01, 8.5);
-    driveway.receiveShadow = true;
-    scene.add(driveway);
+function gable(Wr,Dr,P,x,y,z,ry){
+ var g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry;scene.add(g);
+ var a=Math.atan(P/(Dr/2)),run=Dr/2+.4,L=run/Math.cos(a),rise=P*run/(Dr/2);
+ var sh=new T.Shape();sh.moveTo(-Dr/2,0);sh.lineTo(Dr/2,0);sh.lineTo(0,P);
+ [-1,1].forEach(function(s){var m=new T.Mesh(new T.ShapeGeometry(sh),gabM);m.rotation.y=s*Math.PI/2;m.position.x=s*(Wr/2+.005);m.castShadow=true;g.add(m);
+  var p=box(Wr+.8,.15,L,roofM,0,P-rise/2+.07,s*run/2,g);p.rotation.x=s*a;(g.userData.pl=g.userData.pl||[]).push([p,L]);
+  box(Wr+.8,.11,.11,trimM,0,P-rise-.03,s*(run+.04),g);});
+ box(Wr+.85,.18,.34,roofM,0,P+.05,0,g);return g}
+var W=6,D=5,H=2.6;
+box(W,H,D,wallM,0,H/2,0);var mainRoof=gable(W,D,1.6,0,H,0,0);
+// garage
+box(3.6,2.3,4.4,wallM,-4.8,1.15,.7);gable(4.4,3.6,1.0,-4.8,2.3,.7,Math.PI/2);
+box(2.8,1.9,.06,trimM,-4.8,.95,2.93);for(var i=1;i<4;i++)box(2.8,.025,.07,M('#6b6f72',1),-4.8,i*.475,2.95);
+// downspouts, chimney, steps
+[-3.2,3.2].forEach(function(x){box(.08,H-.35,.08,trimM,x,(H-.35)/2,D/2+.44)});
+box(.75,2.2,.75,brickM,1.7,H+.9,-1);box(.95,.1,.95,concM,1.7,H+2.02,-1);
+box(1.7,.16,.9,concM,0,.08,D/2+.45);
+// door
+box(1.15,1.95,.06,trimM,0,.98,D/2+.02);box(.95,1.75,.1,doorM,0,.9,D/2+.06);box(.5,.4,.12,glassM,0,1.45,D/2+.07);
+var kn=new T.Mesh(new T.SphereGeometry(.04,12,8),goldM);kn.position.set(.33,.95,D/2+.14);scene.add(kn);
+var lamp=new T.Mesh(new T.SphereGeometry(.08,12,8),glassM);lamp.position.set(.95,1.9,D/2+.1);scene.add(lamp);
+// windows
+function win(x,y,z,w,h,side){var q=new T.Group();q.position.set(x,y,z);if(side)q.rotation.y=Math.PI/2;scene.add(q);
+ box(w+.2,h+.2,.06,trimM,0,0,0,q);box(w,h,.08,glassM,0,0,.02,q);box(.04,h,.09,trimM,0,0,.04,q);box(w,.04,.09,trimM,0,0,.04,q);
+ [-1,1].forEach(function(s){box(.32,h+.1,.05,doorM,s*(w/2+.32),0,0,q)});}
+win(-1.9,1.5,D/2,1,1.1);win(1.9,1.5,D/2,1,1.1);win(W/2,1.5,-1.2,.9,1.1,1);win(W/2,1.5,1.2,.9,1.1,1);
+// driveway
+box(3,.03,6,concM,-4.8,.015,5.9);box(1.1,.03,3.2,concM,0,.015,5.2);
+// trees and bushes
+function tree(x,z,s,c){var t=new T.Mesh(new T.CylinderGeometry(.12*s,.2*s,2.2*s,8),M('#5b4331',1));t.position.set(x,1.1*s,z);t.castShadow=true;scene.add(t);
+ [[0,2.7,0,1.5],[.7,2.2,.3,1.1],[-.6,2.3,-.3,1.2],[.1,3.5,.1,1]].forEach(function(p){var b=new T.Mesh(new T.IcosahedronGeometry(p[3]*s,2),M(c,1));b.position.set(x+p[0]*s,p[1]*s,z+p[2]*s);b.castShadow=true;scene.add(b)})}
+tree(-10,-3,1.5,'#3f6b3a');tree(9,-4,1.7,'#4d7a3f');tree(8,7,1.3,'#3a6336');tree(-9,8,1.4,'#56823f');tree(1,-9,1.6,'#3d6a3a');tree(13,2,1.4,'#4a7540');
+[[-1.9,3.1],[1.9,3.1],[-3.9,3.3]].forEach(function(p){var b=new T.Mesh(new T.IcosahedronGeometry(.5,2),M('#3c6a38',1));b.position.set(p[0],.4,p[1]);b.scale.y=.8;b.castShadow=true;scene.add(b)});
 
-    // --- Dynamic Materials ---
-    const roofMaterial = new THREE.MeshStandardMaterial({
-      color: 0x22252a,
-      roughness: 0.75,
-      metalness: 0.1,
-      bumpMap: shingleBump,
-      bumpScale: 0.03
-    });
+// material presets
+function setMat(i){var k=['shingle','metal','tile'][i];roofM.map=roofM.bumpMap=TX[k];
+ roofM.roughness=[.95,.32,.7][i];roofM.metalness=[0,.65,0][i];roofM.bumpScale=[1.5,.4,2.2][i];roofM.needsUpdate=true}
+setMat(0);
+// storm damage: bare patches appear on the roof as the slider moves
+var patchTex=cv(128,128,function(g){g.beginPath();for(var i=0;i<16;i++){var an=i/16*6.283,r=38+rnd()*22,x=64+Math.cos(an)*r,y=64+Math.sin(an)*r*.8;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#2f2822';g.fill();g.save();g.scale(.7,.7);g.translate(27,27);g.beginPath();for(var j=0;j<12;j++){var b=j/12*6.283,q=34+rnd()*16;j?g.lineTo(64+Math.cos(b)*q,64+Math.sin(b)*q*.8):g.moveTo(64+Math.cos(b)*q,64+Math.sin(b)*q*.8)}g.closePath();g.fillStyle='#6d5b48';g.fill();g.restore()});
+var patchM=new T.MeshStandardMaterial({map:patchTex,transparent:true,roughness:1,polygonOffset:true,polygonOffsetFactor:-2});
+var patches=[];
+mainRoof.userData.pl.forEach(function(e){for(var i=0;i<6;i++){var m=new T.Mesh(new T.PlaneGeometry(1,1),patchM);m.rotation.x=-Math.PI/2;m.rotation.z=rnd()*6;m.position.set((rnd()-.5)*5.6,.08,(rnd()-.5)*(e[1]-.9));m.userData={thr:.05+i/6*.85,b:.5+rnd()*.55};m.visible=false;e[0].add(m);patches.push(m)}});
+function dmg(v){patches.forEach(function(m){var k=Math.max(0,Math.min(1,(v-m.userData.thr)*5)),s=m.userData.b*k+.001;m.visible=k>0;m.scale.set(s,s,1)});document.getElementById('n-dmg').textContent=v<.02?'None':Math.round(v*100)+'%'}
 
-    const sidingMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf8fafc,
-      roughness: 0.8,
-      bumpMap: sidingBump,
-      bumpScale: 0.02
-    });
+// orbit
+var th=.65,ph=1.2,rad=17,tg=new T.Vector3(-1,1.8,0),auto=true,pts={},pinch=0;
+canvas.addEventListener('pointerdown',function(e){canvas.setPointerCapture(e.pointerId);pts[e.pointerId]=[e.clientX,e.clientY];auto=false});
+canvas.addEventListener('pointermove',function(e){var p=pts[e.pointerId];if(!p)return;var ids=Object.keys(pts);
+ if(ids.length===2){var o=pts[ids[0]==e.pointerId?ids[1]:ids[0]],d=Math.hypot(e.clientX-o[0],e.clientY-o[1]);if(pinch)rad=Math.min(26,Math.max(8,rad*pinch/d));pinch=d}
+ else{th-=(e.clientX-p[0])*.008;ph=Math.min(1.5,Math.max(.45,ph-(e.clientY-p[1])*.006))}pts[e.pointerId]=[e.clientX,e.clientY]});
+function up(e){delete pts[e.pointerId];pinch=0}
+canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+canvas.addEventListener('wheel',function(e){e.preventDefault();rad=Math.min(26,Math.max(8,rad+e.deltaY*.012))},{passive:false});
+function size(){var w=stage.clientWidth,h=stage.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1?58:38;cam.updateProjectionMatrix()}
+new ResizeObserver(size).observe(stage);size();
+if(matchMedia('(prefers-reduced-motion: reduce)').matches)auto=false;
 
-    const trimMaterial = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 });
-    const whiteTrim = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
-    const glassMaterial = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, metalness: 0.8 });
+// state + loop
+var goal={roof:new T.Color(OPT.roof[0][1]),wall:new T.Color(OPT.wall[1][1]),trim:new T.Color(OPT.trim[0][1]),door:new T.Color(OPT.door[1][1])};
+var cur={top:new T.Color(),bot:new T.Color(),sun:new T.Color(),si:1,hi:.5,pos:new T.Vector3(),glow:0},tgt=null,anim=0;
+function setTime(i,now){var p=TP[i];tgt={top:new T.Color(p.top),bot:new T.Color(p.bot),sun:new T.Color(p.sun),si:p.si,hi:p.hi,pos:new T.Vector3().fromArray(p.pos),glow:p.glow};anim=now?1:90;if(now)step(1)}
+function step(k){cur.top.lerp(tgt.top,k);cur.bot.lerp(tgt.bot,k);cur.sun.lerp(tgt.sun,k);cur.si+=(tgt.si-cur.si)*k;cur.hi+=(tgt.hi-cur.hi)*k;cur.pos.lerp(tgt.pos,k);cur.glow+=(tgt.glow-cur.glow)*k;
+ skyMat.uniforms.top.value.copy(cur.top);skyMat.uniforms.bot.value.copy(cur.bot);scene.fog.color.copy(cur.bot);
+ sun.color.copy(cur.sun);sun.intensity=cur.si;sun.position.copy(cur.pos);hemi.intensity=cur.hi;glassM.emissiveIntensity=cur.glow;stage.style.background='#'+cur.bot.getHexString()}
+function loop(){requestAnimationFrame(loop);if(auto)th+=.0025;
+ roofM.color.lerp(goal.roof,.12);wallM.color.lerp(goal.wall,.12);gabM.color.copy(wallM.color);trimM.color.lerp(goal.trim,.12);doorM.color.lerp(goal.door,.12);
+ if(anim>0){step(.08);anim--}
+ cam.position.set(tg.x+rad*Math.sin(ph)*Math.sin(th),tg.y+rad*Math.cos(ph),tg.z+rad*Math.sin(ph)*Math.cos(th));cam.lookAt(tg);R.render(scene,cam)}
+setTime(0,true);loop();
 
-    // --- House Architecture ---
-    const house = new THREE.Group();
-
-    // 1. Main Two-Story Body
-    const mainWalls = new THREE.Mesh(new THREE.BoxGeometry(11, 6, 8.5), sidingMaterial);
-    mainWalls.position.set(-2, 3, 0);
-    mainWalls.castShadow = mainWalls.receiveShadow = true;
-    house.add(mainWalls);
-
-    // 2. Garage Wing
-    const garageWalls = new THREE.Mesh(new THREE.BoxGeometry(7, 4.5, 8.5), sidingMaterial);
-    garageWalls.position.set(5.5, 2.25, 0.5);
-    garageWalls.castShadow = garageWalls.receiveShadow = true;
-    house.add(garageWalls);
-
-    // 3. Gable Profile Function (Creates an authentic sloped roof with overhangs)
-    function buildGableRoof(width, height, depth) {
-      const shape = new THREE.Shape();
-      const halfW = width / 2;
-      shape.moveTo(-halfW, 0);
-      shape.lineTo(0, height);
-      shape.lineTo(halfW, 0);
-      shape.closePath();
-
-      const extrudeSettings = { depth: depth, bevelEnabled: false };
-      const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-      geo.center();
-      return geo;
-    }
-
-    // Main Roof
-    const mainRoofGeo = buildGableRoof(12.6, 4.2, 9.6);
-    const mainRoofMesh = new THREE.Mesh(mainRoofGeo, roofMaterial);
-    mainRoofMesh.position.set(-2, 7.8, 0);
-    mainRoofMesh.castShadow = true;
-    house.add(mainRoofMesh);
-
-    // Garage Roof
-    const garageRoofGeo = buildGableRoof(8.4, 3.0, 9.6);
-    const garageRoofMesh = new THREE.Mesh(garageRoofGeo, roofMaterial);
-    garageRoofMesh.position.set(5.5, 5.8, 0.5);
-    garageRoofMesh.castShadow = true;
-    house.add(garageRoofMesh);
-
-    // Chimney
-    const chimney = new THREE.Mesh(
-      new THREE.BoxGeometry(1.4, 4.5, 1.4),
-      new THREE.MeshStandardMaterial({ color: 0x853a2f, roughness: 0.9 })
-    );
-    chimney.position.set(-5.5, 8.2, -1.5);
-    chimney.castShadow = true;
-    house.add(chimney);
-
-    // Doors & Windows
-    const garageDoor = new THREE.Mesh(new THREE.BoxGeometry(5.4, 3.4, 0.15), trimMaterial);
-    garageDoor.position.set(5.5, 1.7, 4.8);
-    house.add(garageDoor);
-
-    const frontDoor = new THREE.Mesh(
-      new THREE.BoxGeometry(1.8, 3.6, 0.2),
-      new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.6 })
-    );
-    frontDoor.position.set(-2, 1.8, 4.3);
-    house.add(frontDoor);
-
-    function addWindow(x, y, z) {
-      const g = new THREE.Group();
-      g.add(new THREE.Mesh(new THREE.BoxGeometry(2, 2, 0.1), glassMaterial));
-      const f = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.2, 0.05), whiteTrim);
-      f.position.z = -0.04;
-      g.add(f);
-      g.position.set(x, y, z);
-      house.add(g);
-    }
-    addWindow(-5.2, 3.5, 4.3);
-    addWindow(1.2, 3.5, 4.3);
-    addWindow(-2, 5.0, 4.3);
-
-    scene.add(house);
-
-    // --- Interactive Functions ---
-    function setRoofColor(hex, name, el) {
-      roofMaterial.color.set(hex);
-      document.getElementById('colorTag').innerText = name;
-      document.querySelectorAll('.control-block:nth-child(2) .swatch').forEach(s => s.classList.remove('active'));
-      el.classList.add('active');
-    }
-
-    function setSidingColor(hex, name, el) {
-      sidingMaterial.color.set(hex);
-      document.getElementById('sidingTag').innerText = name;
-      document.querySelectorAll('.control-block:nth-child(3) .swatch').forEach(s => s.classList.remove('active'));
-      el.classList.add('active');
-    }
-
-    function setMaterialType(type, el) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-
-      if (type === 'shingle') {
-        document.getElementById('systemTag').innerText = 'Architectural Shingles';
-        roofMaterial.roughness = 0.75;
-        roofMaterial.metalness = 0.1;
-        roofMaterial.bumpScale = 0.03;
-        document.getElementById('priceDisplay').innerText = '$12,400 – $14,200';
-      } else {
-        document.getElementById('systemTag').innerText = 'Standing Seam Metal';
-        roofMaterial.roughness = 0.3;
-        roofMaterial.metalness = 0.85;
-        roofMaterial.bumpScale = 0.008;
-        document.getElementById('priceDisplay').innerText = '$19,800 – $23,500';
-      }
-    }
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    animate();
-  </script>
+// UI
+function look(){document.getElementById('lyr').style.setProperty('--roofc',OPT.roof[S.roof][1]);document.getElementById('look').textContent=OPT.roof[S.roof][0]+' '+OPT.mat[S.mat].toLowerCase()+', '+OPT.wall[S.wall][0]+' siding, '+OPT.trim[S.trim][0]+' trim, '+OPT.door[S.door][0]+' door';est()}
+function swatches(k){var b=document.getElementById('g-'+k),n=document.getElementById('n-'+k);n.textContent=OPT[k][S[k]][0];
+ OPT[k].forEach(function(o,i){var e=document.createElement('button');e.type='button';e.style.setProperty('--c',o[1]);e.setAttribute('aria-label',o[0]);e.setAttribute('aria-pressed',i===S[k]);
+  e.onclick=function(){S[k]=i;goal[k].set(o[1]);n.textContent=o[0];[].forEach.call(b.children,function(c,j){c.setAttribute('aria-pressed',j===i)});look()};b.appendChild(e)})}
+function seg(k,fn){var b=document.getElementById('g-'+k);OPT[k].forEach(function(o,i){var e=document.createElement('button');e.type='button';e.textContent=o;e.setAttribute('aria-pressed',i===S[k]);
+ e.onclick=function(){S[k]=i;fn(i);[].forEach.call(b.children,function(c,j){c.setAttribute('aria-pressed',j===i)});look()};b.appendChild(e)})}
+['roof','wall','trim','door'].forEach(swatches);seg('mat',setMat);seg('time',function(i){setTime(i)});
+var RATE=[[4.5,7.5],[9,15],[12,20]],sq=document.getElementById('sq');
+function est(){var v=+sq.value,r=RATE[S.mat],f=function(n){return '$'+(Math.round(n/100)*100).toLocaleString('en-US')};
+ document.getElementById('sqv').textContent=v.toLocaleString('en-US');document.getElementById('estm').textContent=OPT.mat[S.mat]+' installed';document.getElementById('estp').textContent=f(v*r[0])+' to '+f(v*r[1])}
+sq.oninput=est;
+var LY=[['Shingles','Your color choice. Sheds water and UV, rated 25 to 50 years.'],['Underlayment','Synthetic water barrier that protects the deck if wind lifts a shingle.'],['Ice and water shield','Self-sealing membrane at eaves and valleys, where most leaks start.'],['Roof decking','Plywood boards. Any soft or rotted ones are replaced before we install.'],['Rafters and ventilation','The structure and airflow that keep your attic dry and shingles cool.']],LC=['var(--roofc)','#8b9298','#2a2d31','#c9a26b','#8a6a43'],lyr=document.getElementById('lyr'),ll=document.getElementById('lylist');
+LY.forEach(function(l,i){var d=document.createElement('div');d.className='ly';d.dataset.i=i;d.style.cssText='--i:'+i+';--lc:'+LC[i];lyr.appendChild(d);
+ var b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed','false');b.innerHTML='<b>'+l[0]+'</b><span>'+l[1]+'</span>';
+ b.onclick=function(){var on=b.getAttribute('aria-pressed')!=='true';[].forEach.call(ll.children,function(x,j){x.setAttribute('aria-pressed','false');lyr.children[j].classList.remove('on')});if(on){b.setAttribute('aria-pressed','true');d.classList.add('on')}};ll.appendChild(b)});
+document.getElementById('ex').oninput=function(){lyr.style.setProperty('--ex',this.value/100)};lyr.style.setProperty('--ex',.6);
+document.getElementById('dmg').oninput=function(){dmg(this.value/100)};
+look();
+document.getElementById('f').onsubmit=function(e){e.preventDefault();/* connect to Formspree/Netlify here */document.getElementById('ok').textContent='Thanks! We will call you shortly. Your look: '+document.getElementById('look').textContent+'.';e.target.reset()};
+})();
+</script>
 </body>
 </html>
