@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Apex Shield 3D Roofing & Exterior Visualizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    :root {
+      --primary: #f59e0b;
+      --primary-hover: #d97706;
+      --panel-bg: rgba(15, 23, 42, 0.90);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #0b0f19; color: var(--text); overflow: hidden; height: 100vh; width: 100vw; position: relative; }
+
+    /* Header */
+    header {
+      position: absolute; top: 0; left: 0; width: 100%; z-index: 30;
+      padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(180deg, rgba(11,15,25,0.95) 0%, rgba(11,15,25,0) 100%);
+      pointer-events: none;
+    }
+    .brand { font-size: 1.1rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+    .brand span { color: var(--primary); }
+    .badge-live { 
+      background: rgba(245, 158, 11, 0.15); border: 1px solid var(--primary); color: #fbbf24;
+      font-size: 0.72rem; padding: 4px 10px; border-radius: 999px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; pointer-events: auto;
+    }
+
+    /* 3D WebGL Canvas */
+    #webgl-canvas { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+
+    /* Interaction Hint */
+    .interaction-hint {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; color: var(--text-muted);
+      z-index: 10; pointer-events: none; backdrop-filter: blur(8px);
+    }
+
+    /* Configurator Floating Panel */
+    .visualizer-ui {
+      position: absolute; top: 70px; right: 20px; width: 340px; max-height: calc(100vh - 95px);
+      background: var(--panel-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; z-index: 25; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+    }
+    .visualizer-ui::-webkit-scrollbar { width: 4px; }
+    .visualizer-ui::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+    .visualizer-ui h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 2px; }
+    .visualizer-ui p.sub { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px; }
+
+    .control-block { margin-bottom: 16px; }
+    .control-block label { 
+      display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; 
+    }
+    .selected-tag { color: var(--primary); font-weight: 600; text-transform: none; }
+
+    /* Swatches */
+    .swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .swatch {
+      height: 38px; border-radius: 8px; border: 2px solid transparent; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700;
+      transition: all 0.2s ease; user-select: none;
+    }
+    .swatch:hover { transform: translateY(-2px); }
+    .swatch.active { border-color: #fff; transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+
+    /* Material Select */
+    .material-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mat-btn {
+      background: #1e293b; border: 1px solid var(--border); color: #fff;
+      padding: 8px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+      text-align: center; transition: all 0.2s;
+    }
+    .mat-btn:hover { background: #334155; }
+    .mat-btn.active { border-color: var(--primary); background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+    /* Camera Angle Presets */
+    .camera-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .cam-btn {
+      background: #1e293b; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 6px; font-size: 0.72rem; font-weight: 600; border-radius: 6px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cam-btn:hover { background: #334155; color: #fff; }
+
+    /* Live Estimate Box */
+    .quote-box {
+      background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; margin-top: 14px;
+    }
+    .quote-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+    .quote-price { font-size: 1.35rem; font-weight: 800; color: #38bdf8; margin: 2px 0; }
+    .quote-detail { font-size: 0.72rem; color: #94a3b8; }
+
+    /* CTA Button */
+    .btn-submit {
+      width: 100%; margin-top: 14px; background: var(--primary); color: #000;
+      font-weight: 800; font-size: 0.88rem; padding: 12px; border: none; border-radius: 8px;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-submit:hover { background: var(--primary-hover); color: #fff; transform: translateY(-1px); }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px);
+    }
+    .modal-box {
+      background: #0f172a; border: 1px solid var(--border); border-radius: 16px;
+      max-width: 380px; width: 100%; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+    }
+    .modal-box h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+    .modal-box p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
+    .modal-box input {
+      width: 100%; background: #1e293b; border: 1px solid var(--border); color: #fff;
+      padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; outline: none;
+    }
+    .modal-box input:focus { border-color: var(--primary); }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .visualizer-ui {
+        top: auto; bottom: 0; left: 0; right: 0; width: 100%;
+        max-height: 48vh; border-radius: 20px 20px 0 0; padding: 16px;
+      }
+      .interaction-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">🏠 Apex Shield <span>3D Studio</span></div>
+    <span class="badge-live">Live Interactive Visualizer</span>
+  </header>
+
+  <div id="webgl-canvas"></div>
+
+  <div class="interaction-hint">👆 Drag to rotate 360° · Pinch / Scroll to zoom</div>
+
+  <!-- UI Control Panel -->
+  <div class="visualizer-ui">
+    <h2>Customize Roof & Exterior</h2>
+    <p class="sub">Select shingle types, siding, and trim colors live on the 3D model.</p>
+
+    <!-- Roof Material -->
+    <div class="control-block">
+      <label>Material Type <span class="selected-tag" id="matTag">Architectural Shingle</span></label>
+      <div class="material-grid">
+        <button class="mat-btn active" onclick="setMaterial('shingle', this)">Asphalt Shingle</button>
+        <button class="mat-btn" onclick="setMaterial('metal', this)">Standing Seam Metal</button>
+      </div>
+    </div>
+
+    <!-- Roof Shingle Colors -->
+    <div class="control-block">
+      <label>Roof Color <span class="selected-tag" id="roofTag">Charcoal Black</span></label>
+      <div class="swatch-grid">
+        <div class="swatch active" style="background:#22252a; color:#fff;" onclick="setRoofColor('#22252a', 'Charcoal Black', this)">Charcoal</div>
+        <div class="swatch" style="background:#52525b; color:#fff;" onclick="setRoofColor('#52525b', 'Pewter Gray', this)">Pewter</div>
+        <div class="swatch" style="background:#6c4427; color:#fff;" onclick="setRoofColor('#6c4427', 'Weathered Wood', this)">Wood</div>
+        <div class="swatch" style="background:#1e3a5f; color:#fff;" onclick="setRoofColor('#1e3a5f', 'Pacific Blue', this)">Blue</div>
+      </div>
+    </div>
+
+    <!-- Home Siding Colors -->
+    <div class="control-block">
+      <label>House Siding <span class="selected-tag" id="sidingTag">Alabaster White</span></label>
+      <div class="swatch-grid">
+        <div class="swatch active" style="background:#e2e8f0; color:#0f172a;" onclick="setSidingColor('#e2e8f0', 'Alabaster White', this)">White</div>
+        <div class="swatch" style="background:#64748b; color:#fff;" onclick="setSidingColor('#64748b', 'Slate Harbor', this)">Slate</div>
+        <div class="swatch" style="background:#b5aa9d; color:#0f172a;" onclick="setSidingColor('#b5aa9d', 'Desert Greige', this)">Greige</div>
+        <div class="swatch" style="background:#1b2432; color:#fff;" onclick="setSidingColor('#1b2432', 'Modern Onyx', this)">Onyx</div>
+      </div>
+    </div>
+
+    <!-- Camera View Presets -->
+    <div class="control-block">
+      <label>Camera Presets</label>
+      <div class="camera-grid">
+        <button class="cam-btn" onclick="setCamera(0, 10, 24)">Front</button>
+        <button class="cam-btn" onclick="setCamera(20, 18, 20)">Aerial Top</button>
+        <button class="cam-btn" onclick="setCamera(-22, 9, 14)">Side Angle</button>
+      </div>
+    </div>
+
+    <!-- Dynamic Estimate Box -->
+    <div class="quote-box">
+      <div class="quote-label">Estimated Replacement Cost (2,400 sq ft)</div>
+      <div class="quote-price" id="priceDisplay">$11,500 – $13,200</div>
+      <div class="quote-detail" id="priceDetail">Includes 50-Yr Limited Lifetime Warranty + Tear-off</div>
+    </div>
+
+    <button class="btn-submit" onclick="toggleModal(true)">Lock In Specs & Request Estimate</button>
+  </div>
+
+  <!-- Lead Capture Modal -->
+  <div class="modal-overlay" id="leadModal">
+    <div class="modal-box">
+      <h3>Get Your Inspection Quote</h3>
+      <p>We send your exact 3D color choices directly to the estimator.</p>
+      
+      <input type="text" placeholder="Homeowner Name" />
+      <input type="tel" placeholder="Phone Number (for instant text)" />
+      <input type="text" placeholder="Property Address" />
+
+      <button class="btn-submit" onclick="submitLead()">Book Free On-Site Inspection</button>
+      <button class="cam-btn" style="width: 100%; margin-top: 10px;" onclick="toggleModal(false)">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // --- 3D Scene Initialization ---
+    const container = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f172a);
+    scene.fog = new THREE.FogExp2(0x0f172a, 0.018);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 10, 24);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.maxPolarAngle = Math.PI / 2 - 0.05;
+    controls.minDistance = 10;
+    controls.maxDistance = 45;
+
+    // --- Lighting ---
+    const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambient);
+
+    const sun = new THREE.DirectionalLight(0xfff5ea, 1.3);
+    sun.position.set(25, 40, 20);
+    sun.castShadow = true;
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
+    scene.add(sun);
+
+    // Ground Plane
+    const groundGeo = new THREE.PlaneGeometry(120, 120);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.95 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Driveway Accent
+    const driveGeo = new THREE.PlaneGeometry(6, 18);
+    const driveMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 });
+    const driveway = new THREE.Mesh(driveGeo, driveMat);
+    driveway.rotation.x = -Math.PI / 2;
+    driveway.position.set(5.5, 0.01, 8);
+    driveway.receiveShadow = true;
+    scene.add(driveway);
+
+    // --- Dynamic Materials ---
+    let roofMat = new THREE.MeshStandardMaterial({ color: 0x22252a, roughness: 0.75, metalness: 0.1 });
+    let sidingMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.85 });
+    const trimMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 });
+    const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, metalness: 0.9 });
+    const doorMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.6 });
+
+    // --- Realistic American Home Architecture Geometry ---
+    const houseGroup = new THREE.Group();
+
+    // Main House Body
+    const mainBody = new THREE.Mesh(new THREE.BoxGeometry(11, 5.5, 9), sidingMat);
+    mainBody.position.set(-1.5, 2.75, 0);
+    mainBody.castShadow = true;
+    mainBody.receiveShadow = true;
+    houseGroup.add(mainBody);
+
+    // Garage Bumpout
+    const garageBody = new THREE.Mesh(new THREE.BoxGeometry(6.5, 4.5, 8), sidingMat);
+    garageBody.position.set(5.5, 2.25, 1);
+    garageBody.castShadow = true;
+    garageBody.receiveShadow = true;
+    houseGroup.add(garageBody);
+
+    // Main Roof (Gabled Hip Structure)
+    const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(9.2, 4.2, 4), roofMat);
+    mainRoof.position.set(-1.5, 7.6, 0);
+    mainRoof.rotation.y = Math.PI / 4;
+    mainRoof.scale.set(1.15, 1, 0.85);
+    mainRoof.castShadow = true;
+    houseGroup.add(mainRoof);
+
+    // Garage Roof
+    const garageRoof = new THREE.Mesh(new THREE.ConeGeometry(5.8, 3.0, 4), roofMat);
+    garageRoof.position.set(5.5, 6.0, 1);
+    garageRoof.rotation.y = Math.PI / 4;
+    garageRoof.scale.set(1.1, 1, 0.85);
+    garageRoof.castShadow = true;
+    houseGroup.add(garageRoof);
+
+    // Brick Chimney
+    const chimneyMat = new THREE.MeshStandardMaterial({ color: 0x88382d, roughness: 0.9 });
+    const chimney = new THREE.Mesh(new THREE.BoxGeometry(1.2, 5.5, 1.2), chimneyMat);
+    chimney.position.set(-4.5, 7.5, -2);
+    chimney.castShadow = true;
+    houseGroup.add(chimney);
+
+    // Garage Door
+    const garageDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 3.4, 0.2), trimMat);
+    garageDoor.position.set(5.5, 1.7, 5.05);
+    houseGroup.add(garageDoor);
+
+    // Front Entrance Door
+    const door = new THREE.Mesh(new THREE.BoxGeometry(1.8, 3.6, 0.2), doorMat);
+    door.position.set(-1.5, 1.8, 4.55);
+    houseGroup.add(door);
+
+    // Windows with Glass Reflex
+    function createWindow(x, y, z) {
+      const win = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 0.15), glassMat);
+      win.position.set(x, y, z);
+      return win;
+    }
+    houseGroup.add(createWindow(-4.5, 3.2, 4.55));
+    houseGroup.add(createWindow(1.5, 3.2, 4.55));
+
+    scene.add(houseGroup);
+
+    // --- Interactive Control Functions ---
+    function setRoofColor(hex, name, el) {
+      roofMat.color.set(hex);
+      document.getElementById('roofTag').innerText = name;
+      document.querySelectorAll('.control-block:nth-child(3) .swatch').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function setSidingColor(hex, name, el) {
+      sidingMat.color.set(hex);
+      document.getElementById('sidingTag').innerText = name;
+      document.querySelectorAll('.control-block:nth-child(4) .swatch').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function setMaterial(type, el) {
+      document.querySelectorAll('.mat-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      
+      const priceDisplay = document.getElementById('priceDisplay');
+      const priceDetail = document.getElementById('priceDetail');
+      const matTag = document.getElementById('matTag');
+
+      if (type === 'shingle') {
+        roofMat.roughness = 0.75;
+        roofMat.metalness = 0.1;
+        matTag.innerText = 'Architectural Shingle';
+        priceDisplay.innerText = '$11,500 – $13,200';
+        priceDetail.innerText = 'Includes 50-Yr Limited Lifetime Warranty + Tear-off';
+      } else {
+        roofMat.roughness = 0.35;
+        roofMat.metalness = 0.8;
+        matTag.innerText = 'Standing Seam Metal';
+        priceDisplay.innerText = '$18,500 – $22,000';
+        priceDetail.innerText = 'Premium Grade Steel with 70-Yr Durability Guarantee';
+      }
+    }
+
+    function setCamera(x, y, z) {
+      camera.position.set(x, y, z);
+      controls.update();
+    }
+
+    function toggleModal(show) {
+      document.getElementById('leadModal').style.display = show ? 'flex' : 'none';
+    }
+
+    function submitLead() {
+      alert("Demo Specification Captured! In client setup, this instantly texts the owner's phone.");
+      toggleModal(false);
+    }
+
+    // Auto Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Render Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
